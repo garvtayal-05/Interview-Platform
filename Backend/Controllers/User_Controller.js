@@ -8,7 +8,7 @@ async function User_SignUp(req, res){
         const temp_user = await Users.findOne({email: email.trim().toLowerCase()})
         
         if(temp_user){
-            return res.status(409).json({Error: "User Already Exsist"});
+            return res.status(409).json({Error: "Email id already exist. Please change it"});
         }
 
     if(!name || !email || !password || !gender || !age){
