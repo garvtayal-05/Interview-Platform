@@ -17,7 +17,7 @@ function checkforAuth(req, res, next){
             return res.status(401).json({Error: "Invalid token format"})
         }
         const user = getUser(token);
-        console.log(user)
+        // console.log(user)
         // console.log(typeof user);
 
 

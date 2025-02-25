@@ -24,14 +24,12 @@ function getUser(token){
         return {Error: "No Token provided"};
     }
     try{
-        console.log("first")
-        // console.log(jwt.verify(token, keySecret))
         return jwt.verify(token, keySecret);
-        // console.log("jhgf")
     }
     catch(error){
+        // console.log(error)
         // console.log(error.name)
-        if(error.name == 'TokenExpired'){
+        if(error.name == 'TokenExpiredError'){
             return {Error: 'Token Has Expired'}
         }
         if(error.name == 'JsonWebTokenError'){
