@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc"; // Google icon
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import {  NavLink, useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +13,7 @@ const SignupPage = () => {
     role: "normal",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false); // To disable the button
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,10 +22,12 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent form submission
+    setIsSubmitting(true); // Disable the button
 
     // Validate form data
     if (!formData.name || !formData.email || !formData.password || !formData.gender || !formData.age) {
       toast.error("All fields are required.");
+      setIsSubmitting(false); // Re-enable the button
       return;
     }
 
@@ -44,40 +46,23 @@ const SignupPage = () => {
       if (!response.ok) {
         // Handle errors from the backend
         toast.error(data.Error || "Signup failed. Please try again.");
+        setIsSubmitting(false); // Re-enable the button
       } else {
         // Handle successful signup
-        toast.success("Signup successful! You can now log in.");
-        // Reset the form
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          gender: "male",
-          age: "",
-          role: "normal",
-        });
+        toast.success("Signup successful! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login"); // Navigate after toast is shown
+        }, 2000); // Wait for 2 seconds before navigating
       }
     } catch (err) {
       console.error("Error:", err);
       toast.error("Something went wrong. Please try again.");
+      setIsSubmitting(false); // Re-enable the button
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-
       <div className="bg-gray-800 shadow-2xl rounded-lg flex flex-col md:flex-row overflow-hidden max-w-5xl w-full relative h-auto md:h-[85vh]">
         
         {/* Triangle Shape Background */}
@@ -95,27 +80,27 @@ const SignupPage = () => {
 
         {/* Left Side - Branding Section */}
         <div className="relative z-10 w-full md:w-2/5 flex flex-col justify-center items-start p-6 md:p-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg animate-fade-in">
             AceBoard
           </h1>
-          <p className="mt-2 md:mt-4 text-sm md:text-lg text-gray-200 drop-shadow-lg">
+          <p className="mt-2 md:mt-4 text-sm md:text-lg text-gray-200 drop-shadow-lg animate-fade-in">
             Join the future of professionals.
           </p>
-          <button className="mt-4 md:mt-6 border border-white text-white py-1 md:py-2 px-4 md:px-6 rounded-lg hover:bg-white hover:text-purple-600 transition duration-300 font-bold">
-             <NavLink to = '/login'> Login</NavLink>
+          <button className="mt-4 md:mt-6 border border-white text-white py-1 md:py-2 px-4 md:px-6 rounded-lg hover:bg-white hover:text-purple-600 transition duration-300 font-bold animate-fade-in">
+             <NavLink to="/login">Login</NavLink>
           </button>
         </div>
 
         {/* Right Side - Signup Form */}
         <div className="w-full md:w-3/5 p-4 md:p-8 relative">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white text-center drop-shadow-lg">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white text-center drop-shadow-lg animate-fade-in">
             Create an Account
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 mt-3 md:mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {/* Full Name */}
-              <div>
+              <div className="animate-slide-in-left">
                 <label className="block text-gray-200 mb-1">Full Name</label>
                 <input
                   type="text"
@@ -128,7 +113,7 @@ const SignupPage = () => {
               </div>
 
               {/* Email */}
-              <div>
+              <div className="animate-slide-in-right">
                 <label className="block text-gray-200 mb-1">Email</label>
                 <input
                   type="email"
@@ -143,7 +128,7 @@ const SignupPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {/* Password */}
-              <div>
+              <div className="animate-slide-in-left">
                 <label className="block text-gray-200 mb-1">Password</label>
                 <input
                   type="password"
@@ -156,7 +141,7 @@ const SignupPage = () => {
               </div>
 
               {/* Age */}
-              <div>
+              <div className="animate-slide-in-right">
                 <label className="block text-gray-200 mb-1">Age</label>
                 <input
                   type="number"
@@ -171,7 +156,7 @@ const SignupPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {/* Gender */}
-              <div>
+              <div className="animate-slide-in-left">
                 <label className="block text-gray-200 mb-1">Gender</label>
                 <select
                   name="gender"
@@ -186,7 +171,7 @@ const SignupPage = () => {
               </div>
 
               {/* Role */}
-              <div>
+              <div className="animate-slide-in-right">
                 <label className="block text-gray-200 mb-1">Role</label>
                 <select
                   name="role"
@@ -204,19 +189,46 @@ const SignupPage = () => {
             {/* Sign Up Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg hover:from-purple-600 hover:to-indigo-600 transition duration-300"
+              className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold py-2 px-4 rounded-lg hover:from-purple-600 hover:to-indigo-600 transition duration-300 animate-fade-in"
+              disabled={isSubmitting}
             >
-              Sign Up
+              {isSubmitting ? "Signing Up..." : "Sign Up"}
             </button>
 
             {/* Google Sign Up */}
-            <button className="w-full flex items-center justify-center border border-gray-500 py-2 px-4 rounded-lg mt-3 hover:bg-gray-700 transition duration-300">
+            <button className="w-full flex items-center justify-center border border-gray-500 py-2 px-4 rounded-lg mt-3 hover:bg-gray-700 transition duration-300 animate-fade-in">
               <FcGoogle className="text-2xl mr-2" />
               Sign up with Google
             </button>
           </form>
         </div>
       </div>
+
+      {/* Media Queries for Responsiveness */}
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .bg-gray-800 {
+              height: auto;
+            }
+            .flex-col {
+              flex-direction: column;
+            }
+            .w-full {
+              width: 100%;
+            }
+            .p-6 {
+              padding: 1.5rem;
+            }
+            .space-y-3 {
+              margin-top: 0.75rem;
+            }
+            .grid-cols-1 {
+              grid-template-columns: 1fr;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };

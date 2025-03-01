@@ -10,3 +10,21 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll {
+  display: flex;
+  animation: infinite-scroll 20s linear infinite;
+}
+
+.animation-paused {
+  animation-play-state: paused;
+}
