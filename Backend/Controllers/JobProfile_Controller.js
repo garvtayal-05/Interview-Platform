@@ -72,7 +72,7 @@ async function GetAllJobProfiles(req, res){
         if(JobProfiles.length === 0){
             return res.status(404).json({Error: "No Job Profiles Found"});
         }
-
+        console.log(JobProfiles)
         return res.status(200).json({Message: "All Job Profiles fetched", Job_Profiles: JobProfiles})
     }
     catch(error){
@@ -81,9 +81,28 @@ async function GetAllJobProfiles(req, res){
     }
 }
 
+async function GetJobProfile(req, res){
+    const {_id} = req.params;
+    // console.log(_id)
+    try{
+        const Profile = await JobProfile.findById({_id});
+
+        if(!Profile){
+            return res.status(404).json({Error: "No Job Profile Found."});
+        }
+        // console.log(Profile)
+        return res.status(200).json({Message: "Job profile fetched", Job_Profile: Profile});
+    }
+    catch(e){
+        console.log(Error, e);
+        return res.status(500).json({Error: "Internal Server Error"});
+    }
+
+}
 
 module.exports ={ 
     CreateJobProfile, 
     GetAllJobProfiles,
-    generateQuestions
+    generateQuestions,
+    GetJobProfile
 }
