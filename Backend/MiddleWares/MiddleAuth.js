@@ -7,6 +7,8 @@ function checkforAuth(req, res, next){
     // console.log(req.user)
     
     try{
+        // console.log(bearer)
+        // console.log(req.headers)
         if (!bearer) { 
             return res.status(401).json({Error: "Please Login" })
         }
@@ -26,7 +28,7 @@ function checkforAuth(req, res, next){
         }
 
         req.user = user;
-        console.log(req.user)
+        // console.log(req.user)
         next();
     }
     catch(error){

@@ -5,13 +5,12 @@ import { useNavigate } from "react-router-dom";
 const FeatureCard = ({ feature, onClick, isSelected }) => {
   const navigate = useNavigate();
 
-  // Handle feature click
   const handleClick = () => {
     if (onClick) {
-      onClick(feature.id); // Trigger the parent's onClick handler
+      navigate(`/features`);
+      // onClick(feature.id); // Trigger the parent's onClick handler
     } else {
-      // Navigate to a feature-specific page
-      navigate(`/features/${feature.id}`);
+      // navigate(`/features`); // Navigate to feature-specific page
     }
   };
 
@@ -24,9 +23,9 @@ const FeatureCard = ({ feature, onClick, isSelected }) => {
     >
       <img
         src={`/Images/${feature.image}`} // Replace with your image URL
-        alt={feature.title}
-        className="w-full h-48 object-cover rounded-lg mb-4"
-      />
+          alt={feature.title}
+          className="w-full h-48 object-cover rounded-lg mb-4"
+        />
       <h3 className="text-xl font-semibold mb-4 text-purple-400">{feature.title}</h3>
       <p className="text-gray-300">{feature.description}</p>
     </div>

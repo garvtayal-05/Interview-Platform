@@ -16,7 +16,9 @@ connectToMongoDB(DataBase_URL);
 
 
 const User_Routes  = require('./Routes/User_Routes');
-const JobProfiles  = require('./Routes/JobProfiles_Routes');
+const JobProfiles_Routes  = require('./Routes/JobProfiles_Routes');
+const Discussion_Routes  = require('./Routes/Discussion_Routes');
+const Comment_Routes  = require('./Routes/Comment_Routes');
 // const { checkforAuth } = require('./MiddleWares/MiddleAuth');
 
 
@@ -26,7 +28,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json())
 
 app.use('/user', User_Routes);
-app.use('/jobprofile', JobProfiles)
+app.use('/jobprofile', JobProfiles_Routes)
+app.use('/discuss', Discussion_Routes)
+app.use('/comment', Comment_Routes)
 
 const PORT = process.env.PORT;
 app.listen(PORT, ()=>{console.log(`Server Started at ${PORT}`)});

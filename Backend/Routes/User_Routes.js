@@ -1,12 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword } = require('../Controllers/User_Controller');
+const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword, User_CreateProfile, User_ApplyJob, User_AppliedJobs } = require('../Controllers/User_Controller');
+const { checkforAuth } = require('../MiddleWares/MiddleAuth');
+require('../Controllers/User_Controller');
+const upload = require('../Controllers/User_Controller').upload;
 
 router.post('/signup',User_SignUp);
 router.post('/login',User_Login);
 router.post('/reset-password', User_PasswordReset)
 router.post('/forgot-password', User_ForgotPassword)
-
+router.post('/create-profile', checkforAuth,  upload.single('file'), User_CreateProfile);
+router.post('/apply-job/:_id', checkforAuth, User_ApplyJob);
+router.get('/applied-jobs', checkforAuth, User_AppliedJobs);
 
 
 module.exports = router

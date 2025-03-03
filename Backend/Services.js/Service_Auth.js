@@ -15,7 +15,7 @@ function setUser(user){
         // password: user.password,
     },
     keySecret, 
-    {expiresIn: '30m'}
+    {expiresIn: '1h'}
 );
 }
 

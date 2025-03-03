@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import JobCard from "../Components/JobCard";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const JobListPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -17,17 +18,38 @@ const JobListPage = () => {
       navigate("/login");
       return;
     }
+    let role = null;
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log("Decoded Token:", decodedToken);
+        role = decodedToken.role || decodedToken.user?.role;
+    }
+    catch(error){
+      console.error("Error decoding token:", error);
+      localStorage.removeItem("token");
+      toast.error("Invalid token. Please log in again.");
+      navigate("/login");
+
+    }
 
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://localhost:1564/jobprofile/fetch", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        console.log(role)
+        console.log(token)
+        const url =
+        role === "admin"
+          ? "http://localhost:1564/jobprofile/"
+          : "http://localhost:1564/jobprofile/fetch";
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers:{
+          Authorization: `Bearer ${token}`,
+        }
+      });
 
         const data = await response.json();
+        console.log(data)
 
         if (!response.ok) {
           throw new Error(data.Error || "Failed to fetch jobs");

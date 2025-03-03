@@ -21,7 +21,6 @@
 }
 
 .animate-infinite-scroll {
-  display: flex;
   animation: infinite-scroll 20s linear infinite;
 }
 

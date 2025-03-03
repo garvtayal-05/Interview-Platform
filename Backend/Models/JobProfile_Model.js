@@ -29,7 +29,11 @@ const JobProfileSchema = new mongoose.Schema(
       ],
       required: true,
     },
-
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
   },
   { timestamps: true }
 );

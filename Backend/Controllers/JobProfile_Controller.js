@@ -54,7 +54,8 @@ async function CreateJobProfile(req, res){
 
    try{
     await JobProfile.create({
-        jobTitle, requirements, questions
+        jobTitle, requirements, questions,
+        createdBy: req.user._id,
     });
 
     return res.status(201).json({Message: "Job Profile Created"});
@@ -100,9 +101,29 @@ async function GetJobProfile(req, res){
 
 }
 
+async function GetJobsCreatedByUser(req, res){
+    const userId = req.user._id;
+    console.log(userId)
+    try{
+        const jobs = await JobProfile.find({createdBy: userId});
+        console.log(jobs)
+
+        if(!jobs || !jobs.length === 0){
+            return res.status(404).json({Error: "No Jobs created by the User"})
+        }
+        
+        return res.status(200).json({Job_Profiles: jobs})
+    }
+    catch(e){
+        console.log("Error: ", e)
+        return res.status(500).json({Error: "Internal server error"})
+    }
+}
+// edit delete and show only creareatd by person, apply job, section for applied jobs
 module.exports ={ 
     CreateJobProfile, 
     GetAllJobProfiles,
     generateQuestions,
-    GetJobProfile
+    GetJobProfile,
+    GetJobsCreatedByUser
 }

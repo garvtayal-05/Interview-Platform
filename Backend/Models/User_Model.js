@@ -37,6 +37,15 @@ const UserSchema = new mongoose.Schema(
       lowercase: true, // Ensures email is stored in lowercase
       trim: true, // Removes leading/trailing spaces
     },
+
+    appliedJobs: [
+      {
+        jobId: { type: mongoose.Schema.Types.ObjectId, ref: "JobProfile" },
+        appliedAt: { type: Date, default: Date.now }, // Timestamp when applied
+        interviewDate: { type: Date }, // Add this field for interview date
+      },
+    ],
+
   },
   { timestamps: true }
 );
