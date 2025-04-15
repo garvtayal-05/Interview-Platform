@@ -6,12 +6,7 @@ const FeatureCard = ({ feature, onClick, isSelected }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (onClick) {
-      navigate(`/features`);
-      // onClick(feature.id); // Trigger the parent's onClick handler
-    } else {
-      // navigate(`/features`); // Navigate to feature-specific page
-    }
+    navigate(feature.link || `/features`); // Default to /features/:id
   };
 
   return (

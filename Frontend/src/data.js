@@ -11,12 +11,14 @@ export const features = [
       title: "Speech-to-Text Analysis",
       description: "Receive real-time feedback on your fluency, clarity, and confidence.",
       image: "stt.jpg",
+      link: "/stt"
     },
     {
       id: 3,
       title: "Resume Integration",
       description: "Upload your resume to get tailored interview questions.",
       image: "resume.jpg",
+      link: "/profile"
     },
     {
       id: 4,
@@ -29,6 +31,14 @@ export const features = [
       title: "Performance Analytics",
       description: "Track your progress with detailed reports and insights.",
       image: "performance.jpg",
+      link:"/report"
+    },
+    {
+      id: 6,
+      title: "Community Forum",
+      description: "Connect, share, and grow with like-minded peers.",
+      image: "communityforum.jpg",
+      link:"/community-form"
     },
   ];
 

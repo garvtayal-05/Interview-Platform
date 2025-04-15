@@ -43,7 +43,7 @@ const CommunityForm = () => {
   // Fetch all discussions
   const fetchDiscussions = async () => {
     try {
-      const data = await fetchWithAuth("http://localhost:1564/discuss/");
+      const data = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/discuss/`);
       if (data) {
         setDiscussions(data);
       }
@@ -57,7 +57,7 @@ const CommunityForm = () => {
   const fetchComments = async (discussionId) => {
     try {
       const data = await fetchWithAuth(
-        `http://localhost:1564/comment/${discussionId}`
+        `${import.meta.env.VITE_API_URL}/comment/${discussionId}`
       );
       if (data) {
         setComments((prev) => ({ ...prev, [discussionId]: data }));
@@ -72,7 +72,7 @@ const CommunityForm = () => {
   const handleCreateDiscussion = async (e) => {
     e.preventDefault();
     try {
-      const data = await fetchWithAuth("http://localhost:1564/discuss/create", {
+      const data = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/discuss/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const CommunityForm = () => {
   const handleDeleteDiscussion = async (id) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:1564/discuss/delete/${id}`,
+        `${import.meta.env.VITE_API_URL}/discuss/delete/${id}`,
         {
           method: "DELETE",
         }
@@ -118,7 +118,7 @@ const CommunityForm = () => {
     if (!commentContent[discussionId]?.trim()) return;
 
     try {
-      const data = await fetchWithAuth("http://localhost:1564/comment/", {
+      const data = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/comment/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +144,7 @@ const CommunityForm = () => {
   const handleUpdateComment = async (commentId, discussionId, updatedContent) => {
     try {
       const data = await fetchWithAuth(
-        `http://localhost:1564/comment/update/${commentId}`,
+        `${import.meta.env.VITE_API_URL}/comment/update/${commentId}`,
         {
           method: "PUT",
           headers: {
@@ -168,7 +168,7 @@ const CommunityForm = () => {
   const handleDeleteComment = async (commentId, discussionId) => {
     try {
       const response = await fetchWithAuth(
-        `http://localhost:1564/comment/delete/${commentId}`,
+        `${import.meta.env.VITE_API_URL}/comment/delete/${commentId}`,
         {
           method: "DELETE",
         }
@@ -202,213 +202,212 @@ const CommunityForm = () => {
   }, [expandedDiscussion]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 text-white p-4 md:p-8">
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-500 opacity-5 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-indigo-500 opacity-5 blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
-        <div className="absolute top-3/4 left-3/4 w-48 h-48 rounded-full bg-purple-400 opacity-5 blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
-      </div>
-      {/* Header with glass effect */}
-      <div className="backdrop-blur-lg bg-black bg-opacity-20 rounded-xl p-6 mb-8 shadow-xl border border-gray-700">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
-          Community Discussions
-        </h1>
-
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-medium transition duration-300 shadow-lg flex items-center"
-          >
-            {isFormVisible ? "Cancel" : "Start a New Discussion"}
-          </button>
-        </div>
-      </div>
-
-      {/* Create Discussion Form - Animated slide down */}
-      {isFormVisible && (
-        <div className="bg-gray-800 bg-opacity-70 backdrop-blur-lg p-6 rounded-xl shadow-xl mb-8 border border-gray-700 transform transition-all duration-300 ease-in-out">
-          <form onSubmit={handleCreateDiscussion}>
-            <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
-              Create a New Discussion
-            </h2>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 bg-opacity-50 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Title"
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 bg-opacity-50 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                rows="4"
-                placeholder="What's on your mind?"
-                required
-              />
-            </div>
-            <div className="flex justify-end">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white pt-8 pb-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6">
+            <h1 className="text-2xl font-bold text-white">Community Discussions</h1>
+            <p className="text-purple-200 mt-1">Share your thoughts and connect with others</p>
+          </div>
+          
+          <div className="p-6">
+            <div className="flex justify-center mb-8">
               <button
-                type="submit"
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 shadow-lg"
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-medium transition duration-300 shadow-lg flex items-center"
               >
-                Publish
+                {isFormVisible ? "Cancel" : "Start a New Discussion"}
               </button>
             </div>
-          </form>
-        </div>
-      )}
 
-      {/* Discussions List */}
-      <div className="space-y-6">
-        {discussions.map((discussion) => (
-          <div
-            key={discussion._id}
-            className="bg-gray-800 bg-opacity-50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 hover:bg-opacity-70"
-          >
-            <div
-              className="cursor-pointer"
-              onClick={() => toggleDiscussion(discussion._id)}
-            >
-              <h3 className="text-xl font-bold mb-2">{discussion.title}</h3>
-              <p className="text-gray-300 mb-4 line-clamp-2">{discussion.content}</p>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">
-                  {comments[discussion._id]?.length || 0} comments
-                </span>
-                <button className="text-indigo-400 text-sm">
-                  {expandedDiscussion === discussion._id ? "Hide Details" : "View Details"}
-                </button>
-              </div>
-            </div>
-
-            {/* Expanded content */}
-            {expandedDiscussion === discussion._id && (
-              <div className="mt-6 pt-6 border-t border-gray-700 animate-fade-in">
-                {/* Full content */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-medium mb-2">Full Discussion</h4>
-                  <p className="text-gray-300">{discussion.content}</p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Created by: {discussion.author?.name || "Unknown"}
-                  </p>
-                </div>
-
-                {/* Comment Input */}
-                <div className="mb-6">
-                  <div className="flex items-start">
-                    <textarea
-                      value={commentContent[discussion._id] || ""}
-                      onChange={(e) =>
-                        setCommentContent((prev) => ({
-                          ...prev,
-                          [discussion._id]: e.target.value,
-                        }))
-                      }
-                      className="flex-grow px-4 py-3 bg-gray-700 bg-opacity-50 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      rows="2"
-                      placeholder="Add your thoughts..."
+            {/* Create Discussion Form - Animated slide down */}
+            {isFormVisible && (
+              <div className="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border border-gray-700 transform transition-all duration-300 ease-in-out">
+                <form onSubmit={handleCreateDiscussion}>
+                  <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+                    Create a New Discussion
+                  </h2>
+                  <div className="mb-6">
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="Title"
+                      required
                     />
+                  </div>
+                  <div className="mb-6">
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      rows="4"
+                      placeholder="What's on your mind?"
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end">
                     <button
-                      onClick={() => handlePostComment(discussion._id)}
-                      className="ml-2 mt-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
-                      disabled={!commentContent[discussion._id]?.trim()}
+                      type="submit"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 shadow-lg"
                     >
-                      Comment
+                      Publish
                     </button>
                   </div>
-                </div>
+                </form>
+              </div>
+            )}
 
-                {/* Display Comments */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-medium mb-2">Comments</h4>
-                  {comments[discussion._id]?.length > 0 ? (
-                    comments[discussion._id].map((comment) => (
-                      <div
-                        key={comment._id}
-                        className="p-4 bg-gray-700 bg-opacity-40 rounded-lg border border-gray-600"
-                      >
-                        <p className="text-gray-300 mb-3">{comment.content}</p>
-                        <p className="text-sm text-gray-400 mb-2">
-                          Commented by: {comment.createdBy?.name || "Unknown"}
+            {/* Discussions List */}
+            <div className="space-y-6">
+              {discussions.map((discussion) => (
+                <div
+                  key={discussion._id}
+                  className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 hover:shadow-xl"
+                >
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => toggleDiscussion(discussion._id)}
+                  >
+                    <h3 className="text-xl font-bold mb-2">{discussion.title}</h3>
+                    <p className="text-gray-300 mb-4 line-clamp-2">{discussion.content}</p>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-400">
+                        {comments[discussion._id]?.length || 0} comments
+                      </span>
+                      <button className="text-indigo-400 text-sm">
+                        {expandedDiscussion === discussion._id ? "Hide Details" : "View Details"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded content */}
+                  {expandedDiscussion === discussion._id && (
+                    <div className="mt-6 pt-6 border-t border-gray-700 animate-fade-in">
+                      {/* Full content */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-medium mb-2">Full Discussion</h4>
+                        <p className="text-gray-300">{discussion.content}</p>
+                        <p className="text-sm text-gray-400 mt-2">
+                          Created by: {discussion.author?.name || "Unknown"}
                         </p>
-                        <div className="flex space-x-2 justify-end text-xs">
-                          <button
-                            onClick={() =>
-                              handleUpdateComment(
-                                comment._id,
-                                discussion._id,
-                                prompt("Edit your comment:", comment.content)
-                              )
+                      </div>
+
+                      {/* Comment Input */}
+                      <div className="mb-6">
+                        <div className="flex items-start">
+                          <textarea
+                            value={commentContent[discussion._id] || ""}
+                            onChange={(e) =>
+                              setCommentContent((prev) => ({
+                                ...prev,
+                                [discussion._id]: e.target.value,
+                              }))
                             }
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-full transition duration-300"
-                          >
-                            Edit
-                          </button>
+                            className="flex-grow px-4 py-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="2"
+                            placeholder="Add your thoughts..."
+                          />
                           <button
-                            onClick={() =>
-                              handleDeleteComment(comment._id, discussion._id)
-                            }
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full transition duration-300"
+                            onClick={() => handlePostComment(discussion._id)}
+                            className="ml-2 mt-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
+                            disabled={!commentContent[discussion._id]?.trim()}
                           >
-                            Delete
+                            Comment
                           </button>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-400 italic">No comments yet. Be the first to comment!</p>
+
+                      {/* Display Comments */}
+                      <div className="space-y-4">
+                        <h4 className="text-lg font-medium mb-2">Comments</h4>
+                        {comments[discussion._id]?.length > 0 ? (
+                          comments[discussion._id].map((comment) => (
+                            <div
+                              key={comment._id}
+                              className="p-4 bg-gray-700 rounded-lg border border-gray-600"
+                            >
+                              <p className="text-gray-300 mb-3">{comment.content}</p>
+                              <p className="text-sm text-gray-400 mb-2">
+                                Commented by: {comment.createdBy?.name || "Unknown"}
+                              </p>
+                              <div className="flex space-x-2 justify-end text-xs">
+                                <button
+                                  onClick={() =>
+                                    handleUpdateComment(
+                                      comment._id,
+                                      discussion._id,
+                                      prompt("Edit your comment:", comment.content)
+                                    )
+                                  }
+                                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-full transition duration-300"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteComment(comment._id, discussion._id)
+                                  }
+                                  className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full transition duration-300"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-gray-400 italic">No comments yet. Be the first to comment!</p>
+                        )}
+                      </div>
+
+                      {/* Delete Discussion Button */}
+                      <div className="mt-8 flex justify-end">
+                        <button
+                          onClick={() => handleDeleteDiscussion(discussion._id)}
+                          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-300"
+                        >
+                          Delete Discussion
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
+              ))}
 
-                {/* Delete Discussion Button */}
-                <div className="mt-8 flex justify-end">
-                  <button
-                    onClick={() => handleDeleteDiscussion(discussion._id)}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-300"
-                  >
-                    Delete Discussion
-                  </button>
+              {discussions.length === 0 && (
+                <div className="text-center py-12 bg-gray-800 rounded-xl border border-gray-700">
+                  <p className="text-gray-300 text-lg">No discussions yet. Start the conversation!</p>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
 
-        {discussions.length === 0 && (
-          <div className="text-center py-12 bg-gray-800 bg-opacity-30 backdrop-blur-sm rounded-xl">
-            <p className="text-gray-300 text-lg">No discussions yet. Start the conversation!</p>
+            {/* Floating action button for small screens */}
+            <div className="md:hidden fixed bottom-6 right-6">
+              <button
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                className="bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition duration-300"
+              >
+                {isFormVisible ? "×" : "+"}
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Floating action button for small screens */}
-      <div className="md:hidden fixed bottom-6 right-6">
-        <button
-          onClick={() => setIsFormVisible(!isFormVisible)}
-          className="bg-purple-600 hover:bg-purple-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition duration-300"
-        >
-          {isFormVisible ? "×" : "+"}
-        </button>
+        </div>
       </div>
 
       {/* CSS Animations */}
       <style>
-  {`
-    @keyframes fade-in {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fade-in {
-      animation: fade-in 0.3s ease-out forwards;
-    }
-  `}
-</style>
+        {`
+          @keyframes fade-in {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+          }
+        `}
+      </style>
     </div>
   );
 };

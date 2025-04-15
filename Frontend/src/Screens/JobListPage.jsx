@@ -38,16 +38,17 @@ const JobListPage = () => {
         console.log(token)
         const url =
         role === "admin"
-          ? "http://localhost:1564/jobprofile/"
-          : "http://localhost:1564/jobprofile/fetch";
-
-      const response = await fetch(url, {
+          ? `${import.meta.env.VITE_API_URL}/jobprofile/`
+          : `${import.meta.env.VITE_API_URL}/jobprofile/fetch`;
+          
+        const response = await fetch(url, {
         method: "GET",
         headers:{
           Authorization: `Bearer ${token}`,
         }
       });
 
+      console.log("data")
         const data = await response.json();
         console.log(data)
 

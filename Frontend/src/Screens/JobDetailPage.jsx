@@ -17,7 +17,7 @@ const JobDetailPage = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:1564/jobprofile/fetch/${_id}`,
+          `${import.meta.env.VITE_API_URL}/jobprofile/fetch/${_id}`,
           {
             method: "GET",
             headers: {
@@ -50,7 +50,7 @@ const JobDetailPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:1564/jobprofile/fetch/${job._id}/generate-questions`, // Use job._id instead of job.jobTitle
+        `${import.meta.env.VITE_API_URL}/jobprofile/fetch/${job._id}/generate-questions`, // Use job._id instead of job.jobTitle
         {
           method: "GET",
           headers: {
@@ -94,7 +94,7 @@ const JobDetailPage = () => {
       setIsApplyingJob(true); // Start loading state
   
       const response = await fetch(
-        `http://localhost:1564/user/apply-job/${_id}`,
+        `${import.meta.env.VITE_API_URL}/user/apply-job/${_id}`,
         {
           method: "POST",
           headers: {

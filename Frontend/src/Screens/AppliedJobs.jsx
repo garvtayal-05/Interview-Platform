@@ -5,14 +5,16 @@ import JobCard from "../Components/JobCard"; // Import the JobCard component
 
 const AppliedJobs = () => {
   const [Jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       try {
+
         const token = localStorage.getItem("token");
+        
         const response = await fetch(
-          "http://localhost:1564/user/applied-jobs",
+          `${import.meta.env.VITE_API_URL}/user/applied-jobs`,
           {
             method: "GET",
             headers: {

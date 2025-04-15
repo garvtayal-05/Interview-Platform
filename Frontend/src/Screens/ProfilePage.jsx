@@ -37,7 +37,7 @@ const ProfilePage = () => {
       }
 
       // Send file to backend for processing
-      const response = await fetch("http://localhost:1564/user/create-profile", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/create-profile`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -270,11 +270,8 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-4 md:p-8 relative overflow-hidden opacity-100 ">
-      {/* Background Elements */}
-      {/* <div className="absolute top-0 left-0 w-64 h-64 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div> */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white pt-8 pb-16 px-4">
+      {/* Background Elements - Removed animated blobs to match Analytics Dashboard */}
       
       {/* Loading Spinner with Blurred Background */}
       {loading && (
@@ -292,116 +289,102 @@ const ProfilePage = () => {
       )}
 
       {/* Page Header */}
-      <div className="text-center mb-12 relative z-10">
-        <h1 className="text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400 inline-block">
-          Professional Profile
-        </h1>
-        <div className="w-32 h-1 mx-auto bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full"></div>
-        <p className="text-gray-300 mt-4 max-w-xl mx-auto">
-          Upload your resume or CV to generate a beautiful, structured profile
-        </p>
-      </div>
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12 relative z-10">
+          <h1 className="text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400 inline-block">
+            Professional Profile
+          </h1>
+          <div className="w-32 h-1 mx-auto bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full"></div>
+          <p className="text-gray-300 mt-4 max-w-xl mx-auto">
+            Upload your resume or CV to generate a beautiful, structured profile
+          </p>
+        </div>
 
-      {/* File Upload Card */}
-      <div className="max-w-4xl mx-auto backdrop-blur-lg bg-gray-700 bg-opacity-50 p-8 rounded-2xl shadow-2xl border border-purple-400 border-opacity-30 relative z-10 transition-all duration-500 hover:shadow-purple-500/20">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="mb-6">
-            <label htmlFor="file" className="block text-xl font-semibold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
-              Upload Your Document
-            </label>
-            
-            {/* File Input */}
-            <div className="relative">
-              <input
-                type="file"
-                id="file"
-                onChange={handleFileChange}
-                className="hidden"
-                accept=".pdf,.docx,.png,.jpg,.jpeg"
-                required
-                disabled={loading}
-              />
-              <label
-                htmlFor="file"
-                className="group flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-purple-400 border-opacity-40 rounded-xl cursor-pointer bg-gray-800 bg-opacity-50 transition-all duration-300 hover:bg-opacity-70 hover:border-opacity-60"
-              >
-                <div className="w-16 h-16 mb-4 text-purple-400 group-hover:text-indigo-400 transition-colors duration-300">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                  </svg>
-                </div>
-                <p className="text-lg text-gray-300 group-hover:text-white transition-colors duration-300">
-                  {file ? file.name : "Drag & drop your file or click to browse"}
-                </p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Supported file types: PDF, DOCX, PNG, JPG, JPEG
-                </p>
-              </label>
-            </div>
+        {/* File Upload Card */}
+        <div className="max-w-4xl mx-auto backdrop-blur-lg bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-700">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6">
+            <h2 className="text-2xl font-bold text-white">Upload Document</h2>
+            <p className="text-purple-200 mt-1">We'll process your document and create a structured profile</p>
           </div>
+          
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* File Input */}
+              <div className="relative">
+                <input
+                  type="file"
+                  id="file"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept=".pdf,.docx,.png,.jpg,.jpeg"
+                  required
+                  disabled={loading}
+                />
+                <label
+                  htmlFor="file"
+                  className="group flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-purple-400 border-opacity-40 rounded-xl cursor-pointer bg-gray-800 bg-opacity-50 transition-all duration-300 hover:bg-opacity-70 hover:border-opacity-60"
+                >
+                  <div className="w-16 h-16 mb-4 text-purple-400 group-hover:text-indigo-400 transition-colors duration-300">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                  </div>
+                  <p className="text-lg text-gray-300 group-hover:text-white transition-colors duration-300">
+                    {file ? file.name : "Drag & drop your file or click to browse"}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Supported file types: PDF, DOCX, PNG, JPG, JPEG
+                  </p>
+                </label>
+              </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-purple-500/30 relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center justify-center">
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path>
-                  </svg>
-                  Upload and Process
-                </>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-purple-500/30 relative overflow-hidden group"
+              >
+                <span className="relative z-10 flex items-center justify-center">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path>
+                      </svg>
+                      Upload and Process
+                    </>
+                  )}
+                </span>
+                <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
+              </button>
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-900 bg-opacity-30 border border-red-500 border-opacity-50 rounded-lg mt-6 animate-pulse">
+                  <p className="text-red-300 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {error}
+                  </p>
+                </div>
               )}
-            </span>
-            <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10"></span>
-          </button>
+            </form>
+          </div>
+        </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-4 bg-red-900 bg-opacity-30 border border-red-500 border-opacity-50 rounded-lg mt-6 animate-pulse">
-              <p className="text-red-300 flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                {error}
-              </p>
-            </div>
-          )}
-        </form>
+        {/* Display Profile */}
+        {renderProfile()}
       </div>
 
-      {/* Display Profile */}
-      {renderProfile()}
-
-      {/* Add some custom style for animations */}
-      <style jsx>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+      {/* Removed blob animation styling since we're no longer using them */}
     </div>
   );
 };

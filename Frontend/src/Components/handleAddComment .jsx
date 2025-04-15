@@ -2,7 +2,7 @@ const [commentContent, setCommentContent] = useState('');
 
 const handleAddComment = async (discussionId) => {
   try {
-    const response = await fetch('http://localhost:1564/comment/', {
+    const response = await fetch('${import.meta.env.VITE_API_URL}/comment/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

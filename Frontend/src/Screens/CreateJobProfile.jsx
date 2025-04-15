@@ -76,7 +76,7 @@ const CreateJobProfilePage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:1564/jobprofile/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/jobprofile/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

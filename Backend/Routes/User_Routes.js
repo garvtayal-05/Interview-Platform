@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword, User_CreateProfile, User_ApplyJob, User_AppliedJobs } = require('../Controllers/User_Controller');
-const { checkforAuth } = require('../MiddleWares/MiddleAuth');
+const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword, User_CreateProfile, User_ApplyJob, User_AppliedJobs, getJobApplications } = require('../Controllers/User_Controller');
+const { checkforAuth, restrictTo} = require('../MiddleWares/MiddleAuth');
 require('../Controllers/User_Controller');
 const upload = require('../Controllers/User_Controller').upload;
 
@@ -12,6 +12,7 @@ router.post('/forgot-password', User_ForgotPassword)
 router.post('/create-profile', checkforAuth,  upload.single('file'), User_CreateProfile);
 router.post('/apply-job/:_id', checkforAuth, User_ApplyJob);
 router.get('/applied-jobs', checkforAuth, User_AppliedJobs);
+router.get('/applications', checkforAuth, restrictTo(['admin']), getJobApplications);
 
 
 module.exports = router

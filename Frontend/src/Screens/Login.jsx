@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc"; // Google icon
 import { toast } from "react-toastify";
 import { NavLink, useNavigate } from "react-router-dom"; // For navigation
+// import apiRequest from "../Utils/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const LoginPage = () => {
 
     try {
       // Send a POST request to the backend
-      const response = await fetch("http://localhost:1564/user/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +39,9 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
+      
+      // const data = await apiRequest('/user/login', 'POST', formData);
+      // console.log(data.token)
 
       if (!response.ok) {
         // Handle errors from the backend

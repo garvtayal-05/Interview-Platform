@@ -19,7 +19,7 @@ const User_Routes  = require('./Routes/User_Routes');
 const JobProfiles_Routes  = require('./Routes/JobProfiles_Routes');
 const Discussion_Routes  = require('./Routes/Discussion_Routes');
 const Comment_Routes  = require('./Routes/Comment_Routes');
-// const { checkforAuth } = require('./MiddleWares/MiddleAuth');
+const STT_Routes = require('./Routes/STT_Routes');
 
 
 
@@ -31,7 +31,8 @@ app.use('/user', User_Routes);
 app.use('/jobprofile', JobProfiles_Routes)
 app.use('/discuss', Discussion_Routes)
 app.use('/comment', Comment_Routes)
+app.use('/stt', STT_Routes)
 
 const PORT = process.env.PORT;
-app.listen(PORT, ()=>{console.log(`Server Started at ${PORT}`)});
+app.listen(PORT, '0.0.0.0', ()=>{console.log(`Server Started at ${PORT}`)});
 

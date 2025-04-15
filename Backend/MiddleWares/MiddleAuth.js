@@ -2,7 +2,7 @@ const {getUser} = require('../Services.js/Service_Auth');
 
 function checkforAuth(req, res, next){
     const bearer = req.headers['authorization'];
-    // console.log(req.user)
+    console.log(bearer)
     req.user = null;
     // console.log(req.user)
     
@@ -28,7 +28,7 @@ function checkforAuth(req, res, next){
         }
 
         req.user = user;
-        // console.log(req.user)
+        console.log(req.user)
         next();
     }
     catch(error){

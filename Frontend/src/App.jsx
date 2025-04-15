@@ -20,6 +20,8 @@ import UnderDevelopment from "./Screens/UnderDevelopment";
 import CommunityForm from "./Screens/CommunityForm";
 import AppliedJobs from "./Screens/AppliedJobs";
 import JobApplications from "./Screens/JobApplications";
+import STT from "./Screens/STT";
+import AnalyticsDashboard from "./Screens/AnalyticsDashboard";
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -79,6 +81,8 @@ const router = createBrowserRouter([
       { path: "features", element: < UnderDevelopment/> },
       { path: "applied-jobs", element: <AppliedJobs /> },
       { path: "applications", element: < JobApplications/> },
+      { path: "stt", element: < STT/> },
+      { path: "report", element: < AnalyticsDashboard/> },
     ],
   },
 ]);

@@ -371,7 +371,62 @@ async function User_AppliedJobs(req, res) {
 
 
 
-
+  const getJobApplications = async (req, res) => {
+    try {
+      const userId = req.user._id; // Current logged-in user (job creator)
+  
+      // 1. Find all jobs created by this user
+      const myJobs = await JobProfile.find({ createdBy: userId }).select('_id jobTitle');
+      
+      if (!myJobs.length) {
+        return res.status(200).json({ 
+          message: "No jobs posted yet", 
+          applications: [] 
+        });
+      }
+  
+      const myJobIds = myJobs.map(job => job._id);
+  
+      // 2. Find all applications for these jobs
+      const applicants = await Users.find({
+        'appliedJobs.jobId': { $in: myJobIds }
+      }).select('name email appliedJobs');
+  
+      // 3. Transform the data
+      const applications = [];
+      
+      applicants.forEach(user => {
+        user.appliedJobs.forEach(application => {
+          if (application.jobId && myJobIds.some(id => id.equals(application.jobId))) {
+            // Find the corresponding job details
+            const job = myJobs.find(j => j._id.equals(application.jobId));
+            
+            applications.push({
+              jobId: application.jobId,
+              jobTitle: job.jobTitle,
+              candidateId: user._id,
+              candidateName: user.name,
+              candidateEmail: user.email,
+              appliedAt: application.appliedAt,
+              interviewDate: application.interviewDate || null
+            });
+          }
+        });
+      });
+  
+      res.status(200).json({ 
+        success: true,
+        count: applications.length,
+        applications 
+      });
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to fetch applications" 
+      });
+    }
+  };
 
 module.exports={
     User_SignUp,
@@ -382,4 +437,7 @@ module.exports={
     upload,
     User_ApplyJob,
     User_AppliedJobs,
+    extractTextFromFile,
+    cleanText,
+    getJobApplications
 }

@@ -2,7 +2,7 @@ const [comments, setComments] = useState({});
 
 const fetchComments = async (discussionId) => {
   try {
-    const response = await fetch(`http://localhost:1564/comment/${discussionId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/comment/${discussionId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
