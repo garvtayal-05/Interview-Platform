@@ -1,4 +1,4 @@
-const Discussion = require('../models/Discussion_Model');
+const Discussion = require('../Models/Discussion_Model');
 
 async function createDiscussion(req, res) {
   const { title, content } = req.body;
