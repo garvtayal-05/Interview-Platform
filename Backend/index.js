@@ -9,8 +9,7 @@ dotenv.config();
 
 
 const connectToMongoDB = require('./connection');
-const DATABASE_URI = process.env.DATABASE_URI;
-connectToMongoDB(DATABASE_URI);
+connectToMongoDB(process.env.DATABASE_URI);
 
 
 
