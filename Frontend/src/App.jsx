@@ -22,6 +22,11 @@ import AppliedJobs from "./Screens/AppliedJobs";
 import JobApplications from "./Screens/JobApplications";
 import STT from "./Screens/STT";
 import AnalyticsDashboard from "./Screens/AnalyticsDashboard";
+import TextInterview from "./Components/TextInterview";
+import VideoInterview from "./Components/VideoInterview";
+import InterviewEvaluation from "./Screens/InterviewEvaluation";
+import InterviewList from "./Screens/InterviewList";
+import MyInterviews from "./Screens/MyInterviews";
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -68,6 +73,7 @@ const router = createBrowserRouter([
       { path: "forgot-password", element: <ResetPasswordPage /> },
       { path: "jobs", element: <JobListPage /> },
       { path: "jobs/:_id", element: <JobDetailPage /> },
+      { path: "applied-jobs/:_id", element: <JobDetailPage /> },
       { path: "jobs/create", element: <CreateJobProfilePage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "explore", element: <ExplorePage /> },
@@ -83,6 +89,12 @@ const router = createBrowserRouter([
       { path: "applications", element: < JobApplications/> },
       { path: "stt", element: < STT/> },
       { path: "report", element: < AnalyticsDashboard/> },
+      { path: "/mock-interview/text", element: <TextInterview/> },
+      { path: "/mock-interview/video", element: <VideoInterview/> },
+      { path: "/evaluate/:interviewId", element: <InterviewEvaluation/> },
+      { path: "interview-list", element: <InterviewList/> },
+      { path: "my-interviews", element: <MyInterviews/> },
+
     ],
   },
 ]);

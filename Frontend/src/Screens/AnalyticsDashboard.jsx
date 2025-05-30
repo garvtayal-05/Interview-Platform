@@ -8,9 +8,21 @@ import { format, parseISO } from 'date-fns';
 
 Chart.register(...registerables);
 
+// Safe date formatting helper
+const formatDateSafe = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    return format(parseISO(dateString), 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
+
 const AnalyticsDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('all');
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -21,17 +33,18 @@ const AnalyticsDashboard = () => {
         const decoded = jwtDecode(token);
         const userId = decoded._id;
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/stt/getUserPerformance/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/stt/getUserPerformance/${userId}`, 
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
           }
-        });
+        );
 
-        if (!response.ok) {
-          throw new Error(await response.text());
-        }
-
+        if (!response.ok) throw new Error(await response.text());
+        
         const data = await response.json();
         setAnalytics(data.analytics);
       } catch (error) {
@@ -43,57 +56,76 @@ const AnalyticsDashboard = () => {
     };
 
     fetchAnalytics();
-  }, []);
+  }, [timeRange]);
 
   if (loading) return <LoadingSpinner />;
   if (!analytics) return <ErrorState onRetry={() => window.location.reload()} />;
 
-  // Chart data preparation functions
+  const prepareScoreDistributionData = () => {
+    return {
+      labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+      datasets: [{
+        label: 'Interview Scores',
+        data: analytics.answerAnalytics?.scoreDistribution || Array(11).fill(0),
+        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+        borderColor: 'rgba(99, 102, 241, 1)',
+        borderWidth: 1
+      }]
+    };
+  };
+
   const prepareProgressChartData = () => {
-    const labels = analytics.progressTrends.monthlyTrends.map(t => format(parseISO(`${t.date}-01`), 'MMM yyyy'));
+    const labels = (analytics.progressTrends?.monthlyTrends || []).map(t => {
+      try {
+        return format(parseISO(`${t.date}-01`), 'MMM yyyy');
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return 'Invalid date';
+      }
+    });
     
     return {
       labels,
       datasets: [
         {
-          label: 'Technical Skills',
-          data: analytics.progressTrends.monthlyTrends.map(t => t.technical),
+          label: 'Interview Scores',
+          data: (analytics.progressTrends?.monthlyTrends || []).map(t => t.interviewScore || 0),
+          borderColor: 'rgb(236, 72, 153)',
+          backgroundColor: 'rgba(236, 72, 153, 0.1)',
+          borderWidth: 3,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: 'rgb(236, 72, 153)',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Mock Scores',
+          data: (analytics.progressTrends?.monthlyTrends || []).map(t => t.mockScore || 0),
           borderColor: 'rgb(139, 92, 246)',
-          backgroundColor: 'rgba(139, 92, 246, 0.3)',
+          backgroundColor: 'rgba(139, 92, 246, 0.1)',
           borderWidth: 3,
           pointBackgroundColor: '#fff',
           pointBorderColor: 'rgb(139, 92, 246)',
           pointRadius: 4,
           pointHoverRadius: 6,
           fill: true,
-          tension: 0.4
-        },
-        {
-          label: 'Communication',
-          data: analytics.progressTrends.monthlyTrends.map(t => t.communication),
-          borderColor: 'rgb(16, 185, 129)',
-          backgroundColor: 'rgba(16, 185, 129, 0.3)',
-          borderWidth: 3,
-          pointBackgroundColor: '#fff',
-          pointBorderColor: 'rgb(16, 185, 129)',
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: true,
-          tension: 0.4
+          tension: 0.3
         }
       ]
     };
   };
 
   const prepareCategoryRadarData = () => {
-    const categories = Object.keys(analytics.categoryPerformance);
+    const categories = Object.keys(analytics.categoryPerformance || {});
     
     return {
       labels: categories,
       datasets: [
         {
           label: 'Average Score',
-          data: categories.map(cat => analytics.categoryPerformance[cat].average),
+          data: categories.map(cat => analytics.categoryPerformance[cat]?.average || 0),
           backgroundColor: 'rgba(139, 92, 246, 0.4)',
           borderColor: 'rgba(139, 92, 246, 1)',
           borderWidth: 2,
@@ -110,27 +142,25 @@ const AnalyticsDashboard = () => {
     };
   };
 
-  const prepareFeedbackPieData = () => {
+  const prepareFeedbackSourceData = () => {
     return {
-      labels: ['Strengths', 'Weaknesses'],
-      datasets: [
-        {
-          data: [
-            analytics.feedbackAnalysis.topStrengths.length,
-            analytics.feedbackAnalysis.topWeaknesses.length
-          ],
-          backgroundColor: [
-            'rgba(16, 185, 129, 0.75)',
-            'rgba(239, 68, 68, 0.75)'
-          ],
-          borderColor: [
-            'rgba(16, 185, 129, 1)',
-            'rgba(239, 68, 68, 1)'
-          ],
-          borderWidth: 2,
-          hoverOffset: 8
-        }
-      ]
+      labels: ['Interview Feedback', 'Mock Feedback'],
+      datasets: [{
+        data: [
+          analytics.feedbackAnalysis?.interviewFeedbacks?.length || 0,
+          analytics.feedbackAnalysis?.sessionFeedbacks?.length || 0
+        ],
+        backgroundColor: [
+          'rgba(236, 72, 153, 0.7)',
+          'rgba(139, 92, 246, 0.7)'
+        ],
+        borderColor: [
+          'rgba(236, 72, 153, 1)',
+          'rgba(139, 92, 246, 1)'
+        ],
+        borderWidth: 1,
+        hoverOffset: 8
+      }]
     };
   };
 
@@ -139,53 +169,104 @@ const AnalyticsDashboard = () => {
       <div className="max-w-7xl mx-auto">
         <div className="bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 p-6 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-20">
-              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#header-gradient)" />
-                <defs>
-                  <linearGradient id="header-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#fff" stopOpacity="0.1" />
-                    <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
             <div className="relative z-10">
-              <h1 className="text-3xl font-bold text-white">Interview Performance Analytics</h1>
-              <div className="flex items-center mt-2">
-                <div className="bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full text-purple-100 text-sm mr-3">
-                  {analytics.sessionCount} Sessions
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-3xl font-bold text-white">Interview Performance Analytics</h1>
+                  <div className="flex items-center mt-2">
+                    <div className="bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full text-purple-100 text-sm mr-3">
+                      {analytics.interviewCount || 0} Interviews • {analytics.sessionCount || 0} Mocks
+                    </div>
+                    <p className="text-purple-100">
+                      {formatDateSafe(analytics.firstActivityDate)} - {formatDateSafe(analytics.lastActivityDate)}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-purple-100">
-                  {format(parseISO(analytics.firstSessionDate), 'MMM d, yyyy')} - {format(parseISO(analytics.lastSessionDate), 'MMM d, yyyy')}
-                </p>
+                <select 
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value)}
+                  className="bg-gray-800 border border-gray-700 text-white rounded-md px-3 py-1 text-sm"
+                >
+                  <option value="week">Last Week</option>
+                  <option value="month">Last Month</option>
+                  <option value="quarter">Last 3 Months</option>
+                  <option value="all">All Time</option>
+                </select>
               </div>
             </div>
           </div>
 
           <div className="p-6">
             {/* Overall Score Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {Object.entries(analytics.overallScores).map(([category, data]) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              {Object.entries(analytics.overallScores || {}).map(([category, data]) => (
                 <ScoreCard 
                   key={category}
-                  title={category.charAt(0).toUpperCase() + category.slice(1)}
+                  title={category.split(/(?=[A-Z])/).join(' ')}
                   score={data.average}
                   maxScore={10}
-                  trend={getTrendEmoji(category, analytics.progressTrends.monthlyTrends)}
+                  trend={getTrendEmoji(category, analytics.progressTrends?.monthlyTrends || [])}
                 />
               ))}
             </div>
 
             {/* Progress Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <ChartContainer title="Skill Progress Over Time" icon="📈">
+              <ChartContainer title="Score Progress Over Time" icon="📈">
                 <Line 
                   data={prepareProgressChartData()}
                   options={chartOptions.line}
                 />
               </ChartContainer>
               
+              <ChartContainer title="Score Distribution" icon="📊">
+                <Bar 
+                  data={prepareScoreDistributionData()}
+                  options={{
+                    ...chartOptions.bar,
+                    scales: {
+                      ...chartOptions.bar.scales,
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: 'Number of Answers',
+                          color: 'rgba(229, 231, 235, 1)'
+                        }
+                      },
+                      x: {
+                        title: {
+                          display: true,
+                          text: 'Score (0-10)',
+                          color: 'rgba(229, 231, 235, 1)'
+                        }
+                      }
+                    }
+                  }}
+                />
+              </ChartContainer>
+            </div>
+
+            {/* Feedback Analysis */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              <ChartContainer title="Feedback Sources" icon="🗂️">
+                <Doughnut 
+                  data={prepareFeedbackSourceData()}
+                  options={chartOptions.pie}
+                />
+              </ChartContainer>
+              
+              <div className="md:col-span-2">
+                <FeedbackAnalysis 
+                  strengths={analytics.feedbackAnalysis?.topStrengths || []}
+                  weaknesses={analytics.feedbackAnalysis?.topWeaknesses || []}
+                  interviewFeedbacks={(analytics.feedbackAnalysis?.interviewFeedbacks || []).slice(0, 3)}
+                />
+              </div>
+            </div>
+
+            {/* Category Performance */}
+            <div className="mb-8">
               <ChartContainer title="Category Performance" icon="🎯">
                 <Radar 
                   data={prepareCategoryRadarData()}
@@ -194,28 +275,14 @@ const AnalyticsDashboard = () => {
               </ChartContainer>
             </div>
 
-            {/* Feedback Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-              <ChartContainer title="Feedback Distribution" icon="📊">
-                <Pie 
-                  data={prepareFeedbackPieData()}
-                  options={chartOptions.pie}
-                />
-              </ChartContainer>
-              
-              <div className="md:col-span-2">
-                <FeedbackAnalysis 
-                  strengths={analytics.feedbackAnalysis.topStrengths}
-                  weaknesses={analytics.feedbackAnalysis.topWeaknesses}
-                />
-              </div>
-            </div>
-
             {/* Timing Metrics */}
-            <TimingMetrics metrics={analytics.timingMetrics} />
+            <TimingMetrics metrics={analytics.timingMetrics || {}} />
 
             {/* Recommendations */}
-            <RecommendationsSection recommendations={analytics.recommendations} />
+            <RecommendationsSection 
+              recommendations={analytics.recommendations || []} 
+              commonThemes={analytics.feedbackAnalysis?.commonThemes || []}
+            />
           </div>
         </div>
       </div>
@@ -261,17 +328,14 @@ const ErrorState = ({ onRetry }) => (
 const ScoreCard = ({ title, score, maxScore, trend }) => {
   const percentage = (score / maxScore) * 100;
   let colorClass = 'text-red-500';
-  let bgColorClass = 'bg-red-500';
   let gradientClass = 'from-red-500 to-red-600';
   
   if (percentage > 65) {
     colorClass = 'text-yellow-500';
-    bgColorClass = 'bg-yellow-500';
     gradientClass = 'from-yellow-500 to-yellow-600';
   }
   if (percentage > 80) {
     colorClass = 'text-green-500';
-    bgColorClass = 'bg-green-500';
     gradientClass = 'from-green-500 to-green-600';
   }
 
@@ -309,13 +373,13 @@ const ChartContainer = ({ title, icon, children }) => (
   </div>
 );
 
-const FeedbackAnalysis = ({ strengths, weaknesses }) => (
+const FeedbackAnalysis = ({ strengths = [], weaknesses = [], interviewFeedbacks = [] }) => (
   <div className="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 transition-all hover:border-purple-500 hover:shadow-purple-900/10 hover:shadow-lg h-full">
     <div className="flex items-center mb-4">
       <span className="mr-2">💬</span>
       <h3 className="text-xl font-semibold text-gray-200">Feedback Analysis</h3>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <div className="bg-gray-800 bg-opacity-70 p-5 rounded-lg border border-gray-600 hover:border-green-500 transition-all">
         <h4 className="font-medium text-green-400 mb-3 flex items-center">
           <span className="w-6 h-6 mr-2 rounded-full bg-green-500 bg-opacity-20 flex items-center justify-center">
@@ -361,10 +425,32 @@ const FeedbackAnalysis = ({ strengths, weaknesses }) => (
         </ul>
       </div>
     </div>
+    {interviewFeedbacks && interviewFeedbacks.length > 0 && (
+      <div className="bg-gray-800 bg-opacity-70 p-5 rounded-lg border border-gray-600">
+        <h4 className="font-medium text-purple-400 mb-3 flex items-center">
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Recent Interview Feedback
+        </h4>
+        <div className="space-y-3">
+          {interviewFeedbacks.map((feedback, i) => (
+            <div key={i} className="border-l-4 border-purple-500 pl-3 py-1">
+              <p className="text-gray-300 italic">"{feedback.feedback}"</p>
+              {feedback.score && (
+                <div className="text-purple-400 text-sm mt-1">
+                  Score: {feedback.score}/10
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
   </div>
 );
 
-const TimingMetrics = ({ metrics }) => (
+const TimingMetrics = ({ metrics = {} }) => (
   <div className="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 transition-all hover:border-purple-500 hover:shadow-purple-900/10 hover:shadow-lg mb-8">
     <div className="flex items-center mb-4">
       <span className="mr-2">⏱️</span>
@@ -372,22 +458,22 @@ const TimingMetrics = ({ metrics }) => (
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <MetricCard 
-        title="Response Time" 
-        value={`${metrics.responseTime?.average || 0}ms`} 
-        description="Average time to answer questions"
+        title="Total Questions" 
+        value={metrics.totalQuestions || 0} 
+        description="Answered across all sessions"
+        icon="❓"
+      />
+      <MetricCard 
+        title="Avg Response Time" 
+        value={`${metrics.averageResponseTime || 0}ms`} 
+        description="Time to answer questions"
         icon="⚡"
       />
       <MetricCard 
-        title="Session Duration" 
-        value={`${metrics.sessionDuration?.average || 0}ms`} 
-        description="Average interview session length"
-        icon="🕒"
-      />
-      <MetricCard 
-        title="Total Questions" 
-        value={metrics.totalQuestions} 
-        description="Across all interview sessions"
-        icon="❓"
+        title="Evaluated Answers" 
+        value={metrics.totalQuestions || 0} 
+        description="With detailed feedback"
+        icon="📝"
       />
     </div>
   </div>
@@ -408,42 +494,65 @@ const MetricCard = ({ title, value, description, icon }) => (
   </div>
 );
 
-const RecommendationsSection = ({ recommendations }) => (
+const RecommendationsSection = ({ recommendations = [], commonThemes = [] }) => (
   <div className="bg-gray-700 rounded-xl p-6 shadow-lg border border-gray-600 transition-all hover:border-purple-500 hover:shadow-purple-900/10 hover:shadow-lg">
     <div className="flex items-center mb-4">
       <span className="mr-2">💡</span>
       <h3 className="text-xl font-semibold text-purple-400">Personalized Recommendations</h3>
     </div>
-    <ul className="space-y-4 bg-gray-800 bg-opacity-70 p-5 rounded-lg border border-gray-600">
-      {recommendations.length > 0 ? (
-        recommendations.map((rec, i) => (
-          <li key={i} className="flex items-start">
-            <span className="bg-purple-900 text-purple-300 rounded-lg p-1.5 mr-3 mt-0.5 shadow-inner shadow-purple-700/30">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
-              </svg>
-            </span>
-            <span className="text-gray-300">{rec}</span>
-          </li>
-        ))
-      ) : (
-        <li className="text-gray-500">No recommendations available</li>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-gray-800 bg-opacity-70 p-5 rounded-lg border border-gray-600">
+        <h4 className="font-medium text-purple-300 mb-3">Based on your performance</h4>
+        <ul className="space-y-3">
+          {recommendations.length > 0 ? (
+            recommendations.map((rec, i) => (
+              <li key={i} className="flex items-start">
+                <span className="bg-purple-900 text-purple-300 rounded-lg p-1.5 mr-3 mt-0.5 shadow-inner shadow-purple-700/30">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clipRule="evenodd" />
+                  </svg>
+                </span>
+                <span className="text-gray-300">{rec}</span>
+              </li>
+            ))
+          ) : (
+            <li className="text-gray-500">No recommendations available</li>
+          )}
+        </ul>
+      </div>
+      {commonThemes && commonThemes.length > 0 && (
+        <div className="bg-gray-800 bg-opacity-70 p-5 rounded-lg border border-gray-600">
+          <h4 className="font-medium text-blue-300 mb-3">Common Feedback Themes</h4>
+          <ul className="space-y-3">
+            {commonThemes.map((theme, i) => (
+              <li key={i} className="flex items-start">
+                <span className="bg-blue-900 text-blue-300 rounded-lg p-1.5 mr-3 mt-0.5 shadow-inner shadow-blue-700/30">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </span>
+                <span className="text-gray-300">{theme}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-    </ul>
+    </div>
   </div>
 );
 
 // Helper functions
 const getTrendEmoji = (category, trends) => {
-  if (trends.length < 2) return '➖';
+  if (!trends || trends.length < 2) return '➖';
   
-  const firstScore = trends[0][category] || 0;
-  const lastScore = trends[trends.length - 1][category] || 0;
+  const firstScore = trends[0]?.[category] || 0;
+  const lastScore = trends[trends.length - 1]?.[category] || 0;
   
   if (lastScore > firstScore + 1) return '📈';
   if (lastScore < firstScore - 1) return '📉';
   return '➖';
 };
+
 
 const chartOptions = {
   line: {
@@ -524,7 +633,38 @@ const chartOptions = {
     },
     elements: {
       line: {
-        tension: 0.4
+        tension: 0.3
+      }
+    }
+  },
+  bar: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 20,
+          color: 'rgba(229, 231, 235, 1)',
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+        titleFont: {
+          size: 14,
+          weight: 'bold'
+        },
+        bodyFont: {
+          size: 13
+        },
+        padding: 12,
+        cornerRadius: 8,
+        caretSize: 6
       }
     }
   },

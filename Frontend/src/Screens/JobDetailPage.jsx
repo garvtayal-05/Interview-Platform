@@ -50,8 +50,8 @@ const JobDetailPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/jobprofile/fetch/${job._id}/generate-questions`, // Use job._id instead of job.jobTitle
-        {
+        `${import.meta.env.VITE_API_URL}/jobprofile/fetch/${job.jobTitle}/generate-questions`, // Use job._id instead of job.jobTitle
+          {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

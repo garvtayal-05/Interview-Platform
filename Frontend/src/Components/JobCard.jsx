@@ -1,8 +1,11 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation} from "react-router-dom";
 import { Briefcase, Building } from "lucide-react";
 
 const JobCard = ({ job }) => {
+  const location = useLocation();
+  const isAppliedJobsPage = location.pathname.includes('applied-jobs');
+
   console.log({ job });
   return (
     <div className="bg-gray-800 rounded-xl shadow-2xl overflow-hidden hover:shadow-purple-500/50 transition-all duration-300 transform hover:-translate-y-2 border border-gray-700">
@@ -54,7 +57,7 @@ const JobCard = ({ job }) => {
 
         {/* View Details Button */}
         <NavLink
-          to={`/jobs/${job._id}`}
+          to={isAppliedJobsPage ? `/applied-jobs/${job._id}` : `/jobs/${job._id}`}
           className="inline-block mt-4 w-full text-center bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-md"
         >
           View Details

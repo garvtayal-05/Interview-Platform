@@ -2,6 +2,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { extractTextFromFile } = require("./User_Controller");
 const STT = require('../Models/STT_Model');
 const mongoose = require('mongoose');
+const Interview = require("../Models/Interview_Model");
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -213,26 +214,34 @@ async function getUserPerformance(req, res) {
   try {
     const { userId } = req.params;
     
-    // Get all sessions for the user, sorted by date
-    const sessions = await STT.find({ userId })
-      .sort({ createdAt: 1 }) // Oldest first for progress tracking
+    // Get all interviews for the user
+    const interviews = await Interview.find({ candidateId: userId })
+      .populate('jobId')
+      .sort({ createdAt: 1 })
       .lean();
 
-    if (!sessions.length) {
-      return res.status(404).json({ message: 'No interview sessions found for this user' });
+    // Get all STT sessions for the user
+    const sessions = await STT.find({ userId })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    if (!interviews.length && !sessions.length) {
+      return res.status(404).json({ message: 'No interview data found for this user' });
     }
 
     // Calculate comprehensive analytics
     const analytics = {
+      interviewCount: interviews.length,
       sessionCount: sessions.length,
-      firstSessionDate: sessions[0].createdAt,
-      lastSessionDate: sessions[sessions.length - 1].createdAt,
-      overallScores: calculateOverallScores(sessions),
+      firstInterviewDate: interviews[0]?.createdAt || sessions[0]?.createdAt,
+      lastInterviewDate: interviews[interviews.length - 1]?.createdAt || sessions[sessions.length - 1]?.createdAt,
+      overallScores: calculateOverallScores(interviews, sessions),
+      answerScores: calculateAnswerScores(interviews),
       categoryPerformance: getCategoryPerformance(sessions),
-      progressTrends: getProgressTrends(sessions),
-      feedbackAnalysis: getFeedbackAnalysis(sessions),
+      progressTrends: getProgressTrends(interviews, sessions),
+      feedbackAnalysis: getFeedbackAnalysis(interviews, sessions),
       timingMetrics: getTimingMetrics(sessions),
-      recommendations: generateRecommendations(sessions)
+      recommendations: generateRecommendations(interviews, sessions)
     };
 
     res.json({
@@ -249,15 +258,45 @@ async function getUserPerformance(req, res) {
   }
 }
 
-// Enhanced helper functions
-function calculateOverallScores(sessions) {
+// Helper functions
+function calculateAnswerScores(interviews) {
+  const scores = {
+    total: 0,
+    count: 0,
+    average: 0,
+    distribution: Array(11).fill(0), // 0-10
+    feedbacks: []
+  };
+
+  interviews.forEach(interview => {
+    interview.answers.forEach(answer => {
+      if (answer.score !== null) {
+        scores.total += answer.score;
+        scores.count++;
+        scores.distribution[Math.round(answer.score)]++;
+        
+        if (answer.feedback) {
+          scores.feedbacks.push(answer.feedback);
+        }
+      }
+    });
+  });
+
+  scores.average = scores.count > 0 ? parseFloat((scores.total / scores.count).toFixed(2)) : 0;
+  
+  return scores;
+}
+
+function calculateOverallScores(interviews, sessions) {
   const result = {
     technical: { total: 0, count: 0, average: 0 },
     communication: { total: 0, count: 0, average: 0 },
     problemSolving: { total: 0, count: 0, average: 0 },
-    confidence: { total: 0, count: 0, average: 0 }
+    confidence: { total: 0, count: 0, average: 0 },
+    interviewScore: { total: 0, count: 0, average: 0 }
   };
 
+  // Process STT sessions
   sessions.forEach(session => {
     if (session.overallEvaluation) {
       for (const category in result) {
@@ -267,6 +306,16 @@ function calculateOverallScores(sessions) {
         }
       }
     }
+  });
+
+  // Process interview scores
+  interviews.forEach(interview => {
+    interview.answers.forEach(answer => {
+      if (answer.score !== null) {
+        result.interviewScore.total += answer.score;
+        result.interviewScore.count++;
+      }
+    });
   });
 
   // Calculate averages

@@ -13,7 +13,7 @@ import {
   Compass,
   FileText,
   Settings,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -251,7 +251,7 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                onMouseEnter={() => setIsDropdownOpen(true)} // Open dropdown on hover
+                onMouseEnter={() => setIsDropdownOpen(true)}
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-purple-400 transition duration-300 flex items-center"
               >
                 More
@@ -265,8 +265,24 @@ const Navbar = () => {
               {isDropdownOpen && (
                 <div
                   className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-700"
-                  onMouseLeave={() => setIsDropdownOpen(false)} // Close dropdown on mouse leave
+                  onMouseLeave={() => setIsDropdownOpen(false)}
                 >
+                  {userRole === "admin" && (
+                    <NavLink
+                      to="/interview-list"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-purple-400 transition duration-300"
+                    >
+                      Received Interviews
+                    </NavLink>
+                  )}
+                  {userRole === "normal" && (
+                    <NavLink
+                      to="/my-interviews"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-purple-400 transition duration-300"
+                    >
+                      My Interviews
+                    </NavLink>
+                  )}
                   <NavLink
                     to="/about-us"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-purple-400 transition duration-300"
@@ -287,7 +303,7 @@ const Navbar = () => {
                   </NavLink>
                 </div>
               )}
-            </div>{" "}
+            </div>
           </div>
 
           {/* Auth Buttons */}

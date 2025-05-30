@@ -14,6 +14,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "argon2": "^0.41.1",
+    "cloudinary": "^2.6.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -21,11 +22,13 @@
     "mammoth": "^1.9.0",
     "mongoose": "^8.10.1",
     "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.9",
     "pdf-parse": "^1.1.1",
     "punycode": "^2.3.1",
     "sharp": "^0.33.5",
+    "streamifier": "^0.1.1",
     "tesseract.js": "^6.0.0"
   }
 }
