@@ -1,5 +1,4 @@
 const Comment = require('../models/Comment_Model');
-const Discussion = require('../models/Discussion_Model');
 
 async function commentOnDiscussion(req, res) {
   const { content, discussionId } = req.body;
@@ -14,13 +13,6 @@ async function commentOnDiscussion(req, res) {
     res.status(500).json({ message: 'Internal server error' });
   }
 }
-
-// module.exports = {
-//   commentOnDiscussion,
-//   getAllCommentsOnDiscussion,
-//   updateComment,
-//   deleteComment,
-// };
 
 async function getAllCommentsOnDiscussion(req, res) {
     const comments = await Comment.find({
