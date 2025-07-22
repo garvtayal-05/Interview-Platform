@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc"; // Google icon
 import { toast } from "react-toastify";
 import { NavLink, useNavigate } from "react-router-dom"; // For navigation
+import { GoogleLogin } from "@react-oauth/google";
+// import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 // import apiRequest from "../Utils/api";
 
 const LoginPage = () => {
@@ -61,6 +64,39 @@ const LoginPage = () => {
       setLoading(false); // Stop loading
     }
   };
+  
+  const handleGoogleSuccess = async (credentialResponse) => {
+  const decoded = jwtDecode(credentialResponse.credential); // contains name, email, sub
+  console.log("Google User:", decoded);
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/user/google-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: decoded.name,
+        email: decoded.email,
+        googleId: decoded.sub,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.Error || "Google login failed");
+
+    toast.success("Login successful!");
+    localStorage.setItem("token", data.token);
+    navigate("/jobs");
+  } catch (err) {
+    toast.error(err.message || "Login error");
+  }
+};
+const handleGoogleError = () => {
+  toast.error("Google login failed");
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
@@ -142,14 +178,20 @@ const LoginPage = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
 
-            {/* Google Login */}
+            {/* Google Login
             <button
               type="button"
               className="w-full flex items-center justify-center border border-gray-500 py-2 px-4 rounded-lg mt-3 hover:bg-gray-700 transition duration-300 animate-fade-in"
             >
               <FcGoogle className="text-2xl mr-2" />
               Log in with Google
-            </button>
+            </button> */}
+
+            <GoogleLogin
+        onSuccess={handleGoogleSuccess}
+        onError={handleGoogleError}
+        useOneTap // optional, for one-tap popup login
+      />
 
             {/* Forgot Password */}
             <p className="text-center text-gray-300 mt-3 animate-fade-in">

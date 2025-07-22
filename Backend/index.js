@@ -35,5 +35,5 @@ app.use('/stt', STT_Routes)
 app.use('/interview', Interview_Routes);
 
 const PORT = process.env.PORT;
-app.listen(PORT, '0.0.0.0', ()=>{console.log(`Server Started at ${PORT}`)});
+app.listen(PORT,  ()=>{console.log(`Server Started at ${PORT}`)});
 

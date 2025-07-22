@@ -2,12 +2,8 @@ const Users = require("../Models/User_Model");
 const { setUser, getUser } = require("../Services.js/Service_Auth");
 const argon2 = require('argon2');
 const jwt = require("jsonwebtoken");
-
-
-
-
-
-
+const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
 
 
 const multer = require("multer");
@@ -185,16 +181,36 @@ async function User_CreateProfile(req, res) {
 
 
 
+async function Google_Login(req, res) {
+  const { name, email, googleId } = req.body;
 
+  if (!email || !googleId || !name) {
+    return res.status(400).json({ Error: "Missing Google credentials" });
+  }
 
+  try {
+    let user = await Users.findOne({ email });
 
+    if (!user) {
+      // New User ➜ Signup
+      user = await Users.create({
+        name,
+        email,
+        password: googleId, // not secure, only for dummy field (you can use a separate field like isGoogleUser: true)
+      });
+    }
 
-
-
+    const token = setUser(user); // your custom JWT generator
+    return res.status(200).json({ token });
+  } catch (err) {
+    console.log("Google Login Error:", err);
+    return res.status(500).json({ Error: "Internal Server Error" });
+  }
+}
 
 
 async function User_SignUp(req, res){
-    const {name, email, password, gender,age,role} = req.body;
+    const {name, email, password} = req.body;
 
         const temp_user = await Users.findOne({email: email.trim().toLowerCase()})
         
@@ -202,7 +218,7 @@ async function User_SignUp(req, res){
             return res.status(409).json({Error: "Email id already exist. Please change it"});
         }
 
-    if(!name || !email || !password || !gender || !age){
+    if(!name || !email || !password){
         return res.status(400).json({Error: "All fields are necessary"})
     }
     
@@ -212,8 +228,6 @@ async function User_SignUp(req, res){
          name, 
          email, 
          password: hashedPassword,
-         gender, age,
-         role
         });
 
         return res.status(200).json({Message: "User Created"});
@@ -254,60 +268,76 @@ async function User_Login(req,res){
     }
 }
 
-async function User_ForgotPassword (req, res){
-    const { email } = req.body;
-    
-    const user = await Users.findOne({email});
-    if (!user) {
-        return res.status(404).json({ error: "User not found" });
-    }
+async function User_ForgotPassword(req, res) {
+  const { email } = req.body;
 
-    const token = jwt.sign({email}, process.env.JWT_SECRET, { expiresIn: "3m" });
+  const user = await Users.findOne({ email });
+  if (!user) {
+    return res.status(200).json({ message: "If user exists, an email will be sent" }); // Don't leak user info
+  }
 
-    return res.status(200).json({ resetToken: token, message: "Copy this token to reset your password" });
-};
+  const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "10m" });
 
-async function User_PasswordReset(req, res){
-    const resetToken = req.headers['resettoken'];
-    // console.log(resetToken)
+  const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
-    const {newPassword} = req.body;
+  // ✅ Send Email
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
+    },
+  });
 
-    if(!resetToken){
-        return res.status(400).json({Error: "Reset Token is required"})
-    }
-    if(!newPassword){
-        return res.status(400).json({Error: "New Password required"})
-    }
+  await transporter.sendMail({
+    from: `"AceBoard" <${process.env.MAIL_USER}>`,
+    to: user.email,
+    subject: "Password Reset Link",
+    html: `<p>Click the link below to reset your password. This link will expire in 10 minutes:</p>
+           <a href="${resetLink}">${resetLink}</a>`,
+  });
 
-    try{
-
-        const decodeToken = getUser(resetToken)
-        
-        if(decodeToken.Error){
-            return res.status(401).json({Error: decodeToken.Error});
-        }
-
-        const user = await Users.findOne({email: decodeToken.email})
-        console.log(user.email)
-        
-        if(!user){
-            return res.status(404).json({Error: "No user found!"})
-        }
-        
-        const newHashedPassword =  await argon2.hash(newPassword);
-        user.password = newHashedPassword;
-        await user.save();
-
-        return res.json({ message: "Password reset successfully" }).status(201);
-    }
-    catch(Error){
-        console.log(Error)
-        return res.status(500).json({Error: "Internal Server Error"})
-    }    
+  return res.status(200).json({ message: "Reset link sent if user exists" });
 }
 
-const mongoose = require("mongoose");
+
+async function User_PasswordReset(req, res) {
+  const { resetToken, newPassword } = req.body;
+  const token = resetToken;
+console.log(req.body)
+  if (!token) return res.status(400).json({ Error: "Token required" });
+
+  try {
+    const { email } = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await Users.findOne({ email });
+
+    if (!user) return res.status(404).json({ Error: "User not found" });
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ Error: "Password must be at least 6 characters" });
+    }
+
+    user.password = await argon2.hash(newPassword);
+    await user.save();
+
+    return res.status(200).json({ message: "Password reset successfully" });
+  } catch (err) {
+    return res.status(401).json({ Error: "Token is invalid or expired" });
+  }
+}
+
+
+async function verify_token(req, res){
+   const { resetToken } = req.body;
+
+  try {
+    jwt.verify(resetToken, process.env.JWT_SECRET);
+    return res.status(200).json({ valid: true });
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+}
+
 
 const User_ApplyJob = async (req, res) => {
   try {
@@ -439,5 +469,7 @@ module.exports={
     User_AppliedJobs,
     extractTextFromFile,
     cleanText,
-    getJobApplications
+    getJobApplications,
+    Google_Login,
+    verify_token
 }

@@ -68,9 +68,9 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "signup", element: <Signup /> },
-      { path: "login", element: <Login /> },
-      { path: "forgot-password", element: <ResetPasswordPage /> },
+      { path: "login", element: <Signup /> },
+      // { path: "login", element: <Login /> }, 
+      { path: "reset-password", element: <ResetPasswordPage /> },
       { path: "jobs", element: <JobListPage /> },
       { path: "jobs/:_id", element: <JobDetailPage /> },
       { path: "applied-jobs/:_id", element: <JobDetailPage /> },
@@ -101,10 +101,12 @@ const router = createBrowserRouter([
 
 // Main App Component
 const App = () => (
+  // <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
   <>
     <ToastContainer position="top-right" autoClose={1500} pauseOnHover />
     <RouterProvider router={router} />
   </>
+  // </GoogleOAuthProvider>
 );
 
 export default App;
