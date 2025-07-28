@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post('/add-experience',checkforAuth, CreateExperience);
-router.get('/get-experience',checkforAuth, Get_All_Experiences);
+router.get('/get-experience', Get_All_Experiences);
 router.get('/get_user_experiences',checkforAuth, Get_User_Experiences);
 router.patch('/Update_Experience/:id',checkforAuth, Update_Experience);
 router.delete('/Delete_Experience/:id',checkforAuth, Delete_Experience);
