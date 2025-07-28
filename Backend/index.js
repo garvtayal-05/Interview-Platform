@@ -20,6 +20,7 @@ const Discussion_Routes  = require('./Routes/Discussion_Routes');
 const Comment_Routes  = require('./Routes/Comment_Routes');
 const STT_Routes = require('./Routes/STT_Routes');
 const Interview_Routes = require('./Routes/Interview_Routes');
+const Experience_Routes = require('./Routes/Experience_Routes')
 
 
 
@@ -33,6 +34,7 @@ app.use('/discuss', Discussion_Routes)
 app.use('/comment', Comment_Routes)
 app.use('/stt', STT_Routes)
 app.use('/interview', Interview_Routes);
+app.use('/experience', Experience_Routes);
 
 const PORT = process.env.PORT;
 app.listen(PORT,  ()=>{console.log(`Server Started at ${PORT}`)});

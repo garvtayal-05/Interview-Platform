@@ -27,6 +27,8 @@ import VideoInterview from "./Components/VideoInterview";
 import InterviewEvaluation from "./Screens/InterviewEvaluation";
 import InterviewList from "./Screens/InterviewList";
 import MyInterviews from "./Screens/MyInterviews";
+import Experiences from "./Screens/Experiences";
+import PrivacyPolicy from "./Screens/Privacy";
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -94,6 +96,8 @@ const router = createBrowserRouter([
       { path: "/evaluate/:interviewId", element: <InterviewEvaluation/> },
       { path: "interview-list", element: <InterviewList/> },
       { path: "my-interviews", element: <MyInterviews/> },
+      { path: "experiences", element: <Experiences/> },
+      { path: "privacy", element: <PrivacyPolicy/> },
 
     ],
   },

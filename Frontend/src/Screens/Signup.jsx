@@ -120,7 +120,7 @@ const AuthPage = () => {
           }
           setFormData({ name: "", email: "", password: "" });
           setTimeout(() => {
-            navigate("/jobs");
+            navigate("/experiences");
           }, 1500);
         } else {
           toast.success("Account created successfully");
@@ -168,7 +168,7 @@ const AuthPage = () => {
       }
 
       setTimeout(() => {
-        navigate("/jobs");
+        navigate("/experiences");
       }, 1500);
 
     } catch (err) {

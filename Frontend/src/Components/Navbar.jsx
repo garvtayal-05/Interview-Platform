@@ -14,6 +14,7 @@ import {
   FileText,
   Settings,
   MessageSquare,
+  Star, // Icon for Experiences
 } from "lucide-react";
 
 const Navbar = () => {
@@ -149,6 +150,7 @@ const Navbar = () => {
               <Home className="h-4 w-4 mr-1" />
               Home
             </NavLink>
+            
             <NavLink
               to="/jobs"
               className={({ isActive }) =>
@@ -162,6 +164,22 @@ const Navbar = () => {
               <Briefcase className="h-4 w-4 mr-1" />
               Jobs
             </NavLink>
+
+            {/* Experiences Section - Available to all users */}
+            <NavLink
+              to="/experiences"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive
+                    ? "bg-gray-800 text-purple-400"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-purple-400"
+                } transition duration-300 flex items-center`
+              }
+            >
+              <Star className="h-4 w-4 mr-1" />
+              Experiences
+            </NavLink>
+
             <NavLink
               to="/explore"
               className={({ isActive }) =>
@@ -175,7 +193,8 @@ const Navbar = () => {
               <Compass className="h-4 w-4 mr-1" />
               Explore
             </NavLink>
-            {/* New Community Forum Button */}
+
+            {/* Community Forum Button */}
             <NavLink
               to="/community-form"
               className={({ isActive }) =>
@@ -189,6 +208,7 @@ const Navbar = () => {
               <MessageSquare className="h-4 w-4 mr-1" />
               Community Forum
             </NavLink>
+
             {userRole === "admin" && (
               <NavLink
                 to="/jobs/create"
@@ -204,6 +224,7 @@ const Navbar = () => {
                 Create Job
               </NavLink>
             )}
+
             {userRole === "admin" && (
               <NavLink
                 to="/applications"
@@ -219,6 +240,7 @@ const Navbar = () => {
                 Job Applications
               </NavLink>
             )}
+
             {userRole === "normal" && (
               <NavLink
                 to="/applied-jobs"
@@ -234,6 +256,7 @@ const Navbar = () => {
                 Applied Jobs
               </NavLink>
             )}
+
             <NavLink
               to="/profile"
               className={({ isActive }) =>
@@ -247,6 +270,7 @@ const Navbar = () => {
               <User className="h-4 w-4 mr-1" />
               Profile
             </NavLink>
+
             {/* Dropdown Menu */}
             <div className="relative" ref={dropdownRef}>
               <button
@@ -318,14 +342,8 @@ const Navbar = () => {
               </button>
             ) : (
               <>
-                {/* <NavLink
-                  to="/login"
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300 shadow-md"
-                >
-                  Login
-                </NavLink> */}
                 <NavLink
-                  to="/signup"
+                  to="/login"
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 shadow-md"
                 >
                   Login
@@ -370,6 +388,21 @@ const Navbar = () => {
                 Jobs
               </NavLink>
 
+              {/* Experiences Section - Mobile */}
+              <NavLink
+                to="/experiences"
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive
+                      ? "bg-gray-800 text-purple-400"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-purple-400"
+                  } transition duration-300 flex items-center`
+                }
+              >
+                <Star className="h-5 w-5 mr-2" />
+                Experiences
+              </NavLink>
+
               <NavLink
                 to="/explore"
                 className={({ isActive }) =>
@@ -384,7 +417,7 @@ const Navbar = () => {
                 Explore
               </NavLink>
 
-              {/* New Community Forum Button - Mobile */}
+              {/* Community Forum Button - Mobile */}
               <NavLink
                 to="/community-form"
                 className={({ isActive }) =>
@@ -522,12 +555,12 @@ const Navbar = () => {
                   >
                     Login
                   </NavLink>
-                  <NavLink
+                  {/* <NavLink
                     to="/signup"
                     className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-md transition duration-300 text-center"
                   >
                     Register
-                  </NavLink>
+                  </NavLink> */}
                 </>
               )}
             </div>
