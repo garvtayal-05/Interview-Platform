@@ -13,6 +13,7 @@ const Experiences = () => {
   const [selectedExperience, setSelectedExperience] = useState(null);
   const [editingExperience, setEditingExperience] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterOffer, setFilterOffer] = useState("");
   const [filterDifficulty, setFilterDifficulty] = useState("");
@@ -42,6 +43,7 @@ const Experiences = () => {
         const user = JSON.parse(userData);
         console.log("Current User from userData:", user._id);
         setCurrentUserId(user._id);
+        setIsLoggedIn(true);
         return;
       } catch (error) {
         console.error("Error parsing userData:", error);
@@ -62,22 +64,39 @@ const Experiences = () => {
         console.log("Current User from token:", decodedToken);
         const userId = decodedToken._id || decodedToken.id || decodedToken.userId;
         setCurrentUserId(userId);
+        setIsLoggedIn(true);
       } catch (error) {
         console.error("Error decoding token:", error);
+        setIsLoggedIn(false);
       }
+    } else {
+      setIsLoggedIn(false);
     }
+  };
+
+  // ✅ NEW: Function to check login and show error
+  const requireLogin = (action) => {
+    if (!isLoggedIn) {
+      toast.error(`Please login to ${action}`);
+      return false;
+    }
+    return true;
   };
 
   const fetchExperiences = async () => {
     try {
+      // ✅ MODIFIED: Make API call without token for public access
       const token = localStorage.getItem("token");
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/experience/get-experience`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers,
         }
       );
       
@@ -94,8 +113,9 @@ const Experiences = () => {
     }
   };
 
-  // ✅ NEW: Function to fetch only user's experiences
   const fetchUserExperiences = async () => {
+    if (!requireLogin("view your experiences")) return;
+
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -124,6 +144,8 @@ const Experiences = () => {
   };
 
   const handleVote = async (experienceId, voteType) => {
+    if (!requireLogin("vote on experiences")) return;
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -173,6 +195,8 @@ const Experiences = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!requireLogin("share experience")) return;
+
     if (!formData.currentRole || !formData.companyName || !formData.offer || !formData.experience || !formData.difficulty) {
       toast.error("Please fill in all required fields");
       return;
@@ -182,7 +206,6 @@ const Experiences = () => {
     try {
       const token = localStorage.getItem("token");
       
-      // ✅ FIXED: Correct URL with experience ID for updates
       const url = editingExperience 
         ? `${import.meta.env.VITE_API_URL}/experience/Update_Experience/${editingExperience._id}`
         : `${import.meta.env.VITE_API_URL}/experience/add-experience`;
@@ -199,6 +222,7 @@ const Experiences = () => {
       });
 
       const data = await response.json();
+      console.log(data)
       if (!response.ok) throw new Error(data.Error);
 
       toast.success(data.Message);
@@ -229,6 +253,8 @@ const Experiences = () => {
   };
 
   const handleEdit = (experience) => {
+    if (!requireLogin("edit experience")) return;
+
     setEditingExperience(experience);
     setFormData({
       name: experience.name || "",
@@ -244,12 +270,13 @@ const Experiences = () => {
   };
 
   const handleDelete = async (experienceId) => {
+    if (!requireLogin("delete experience")) return;
+
     if (!window.confirm("Are you sure you want to delete this experience?")) return;
 
     try {
       const token = localStorage.getItem("token");
       
-      // ✅ FIXED: Correct URL with experience ID for delete
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/experience/Delete_Experience/${experienceId}`,
         {
@@ -276,9 +303,30 @@ const Experiences = () => {
     }
   };
 
+  // ✅ MODIFIED: Check login before opening detail modal
   const handleViewDetails = (experience) => {
+    if (!requireLogin("view full experience")) return;
+    
     setSelectedExperience(experience);
     setIsDetailModalOpen(true);
+  };
+
+  // ✅ MODIFIED: Check login before opening share form
+  const handleShareExperience = () => {
+    if (!requireLogin("share experience")) return;
+
+    setIsFormOpen(true);
+    setEditingExperience(null);
+    setFormData({
+      name: "",
+      email: "",
+      linkedin: "",
+      currentRole: "",
+      companyName: "",
+      offer: "",
+      experience: "",
+      difficulty: "",
+    });
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -320,8 +368,8 @@ const Experiences = () => {
           Interview Experiences
         </h1>
         <div className="flex items-center space-x-3">
-          {/* ✅ NEW: Button to show only user's experiences */}
-          {currentUserId && (
+          {/* ✅ MODIFIED: Only show "My Experiences" if logged in */}
+          {isLoggedIn && currentUserId && (
             <button
               onClick={showOnlyUserExperiences ? fetchExperiences : fetchUserExperiences}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
@@ -336,20 +384,7 @@ const Experiences = () => {
           )}
           
           <button
-            onClick={() => {
-              setIsFormOpen(true);
-              setEditingExperience(null);
-              setFormData({
-                name: "",
-                email: "",
-                linkedin: "",
-                currentRole: "",
-                companyName: "",
-                offer: "",
-                experience: "",
-                difficulty: "",
-              });
-            }}
+            onClick={handleShareExperience}
             className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold"
           >
             <Plus size={20} />
@@ -358,12 +393,21 @@ const Experiences = () => {
         </div>
       </div>
 
-      {/* Show current view indicator */}
-      {showOnlyUserExperiences && (
+      {/* ✅ MODIFIED: Only show user experience indicator if logged in */}
+      {isLoggedIn && showOnlyUserExperiences && (
         <div className="mb-4 p-3 bg-indigo-800/30 border border-indigo-600 rounded-lg">
           <p className="text-indigo-300 text-sm flex items-center">
             <UserCheck size={16} className="mr-2" />
             Showing only your experiences ({experiences.length} found)
+          </p>
+        </div>
+      )}
+
+      {/* ✅ NEW: Show login prompt for non-logged-in users */}
+      {!isLoggedIn && (
+        <div className="mb-4 p-4 bg-yellow-800/30 border border-yellow-600 rounded-lg">
+          <p className="text-yellow-300 text-sm">
+            📖 You can browse experiences as a guest. Please login to vote, view full details, or share your own experience.
           </p>
         </div>
       )}
@@ -451,8 +495,8 @@ const Experiences = () => {
                     </div>
                   </div>
                   
-                  {/* Owner actions */}
-                  {currentUserId && experience.createdBy === currentUserId && (
+                  {/* ✅ MODIFIED: Only show edit/delete for logged in owners */}
+                  {isLoggedIn && currentUserId && experience.createdBy === currentUserId && (
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => {
@@ -514,7 +558,7 @@ const Experiences = () => {
                         handleVote(experience._id, 'upvote');
                       }}
                       className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
-                        experience.upvotes?.includes(currentUserId)
+                        isLoggedIn && experience.upvotes?.includes(currentUserId)
                           ? 'bg-green-600 text-white' 
                           : 'bg-gray-700 text-gray-300 hover:bg-green-600/20'
                       }`}
@@ -529,7 +573,7 @@ const Experiences = () => {
                         handleVote(experience._id, 'downvote');
                       }}
                       className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
-                        experience.downvotes?.includes(currentUserId)
+                        isLoggedIn && experience.downvotes?.includes(currentUserId)
                           ? 'bg-red-600 text-white' 
                           : 'bg-gray-700 text-gray-300 hover:bg-red-600/20'
                       }`}
@@ -643,7 +687,7 @@ const Experiences = () => {
                   <button
                     onClick={() => handleVote(selectedExperience._id, 'upvote')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
-                      selectedExperience.upvotes?.includes(currentUserId)
+                      isLoggedIn && selectedExperience.upvotes?.includes(currentUserId)
                         ? 'bg-green-600 text-white' 
                         : 'bg-gray-600 text-gray-300 hover:bg-green-600/20'
                     }`}
@@ -655,7 +699,7 @@ const Experiences = () => {
                   <button
                     onClick={() => handleVote(selectedExperience._id, 'downvote')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
-                      selectedExperience.downvotes?.includes(currentUserId)
+                      isLoggedIn && selectedExperience.downvotes?.includes(currentUserId)
                         ? 'bg-red-600 text-white' 
                         : 'bg-gray-600 text-gray-300 hover:bg-red-600/20'
                     }`}
@@ -666,7 +710,7 @@ const Experiences = () => {
                 </div>
 
                 {/* Owner actions in modal */}
-                {currentUserId && selectedExperience.createdBy === currentUserId && (
+                {isLoggedIn && currentUserId && selectedExperience.createdBy === currentUserId && (
                   <div className="flex gap-3">
                     <button
                       onClick={() => {

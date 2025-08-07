@@ -45,17 +45,17 @@ const HomePage = () => {
     // Select a random image from the heroImages array  
     const randomIndex = Math.floor(Math.random() * heroImages.length);
     const selectedImage = heroImages[randomIndex];
-    console.log("Selected Hero Image Path:", selectedImage);
+    // console.log("Selected Hero Image Path:", selectedImage);
 
     // Check if the image exists
     const img = new Image();
     img.src = selectedImage;
     img.onload = () => {
-      console.log("Image loaded successfully:", selectedImage);
+      // console.log("Image loaded successfully:", selectedImage);
       setHeroImage(selectedImage);
     };
     img.onerror = () => {
-      console.error("Failed to load hero image:", selectedImage);
+      // console.error("Failed to load hero image:", selectedImage);
       setHeroImage(null);
     };
   }, []);

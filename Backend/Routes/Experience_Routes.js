@@ -1,5 +1,5 @@
 const express = require('express');
-const { CreateExperience, Get_All_Experiences, Get_User_Experiences, Update_Experience, Delete_Experience, upvoteExperience, downvoteExperience } = require('../Controllers/Experience.Controller');
+const { CreateExperience, Get_All_Experiences, Get_User_Experiences, Update_Experience, Delete_Experience, upvoteExperience, downvoteExperience } = require('../Controllers/Experience_Controller');
 const { checkforAuth } = require('../MiddleWares/MiddleAuth');
 const router = express.Router();
 
