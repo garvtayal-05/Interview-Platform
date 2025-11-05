@@ -121,7 +121,7 @@ const HomePage = () => {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
             {/* Get Started Button */}
-            <NavLink to="/signup" className="w-full sm:w-auto">
+            <NavLink to="/login" className="w-full sm:w-auto">
               <button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg border-2 border-transparent hover:from-purple-700 hover:to-indigo-700 hover:border-white/20 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/30">
                 Get Started
               </button>
@@ -303,7 +303,7 @@ const HomePage = () => {
               <p className="text-gray-300 mb-6 max-w-lg">
                 Join thousands of job seekers who are using AceBoard to prepare for their dream jobs.
               </p>
-              <NavLink to="/signup">
+              <NavLink to="/login">
                 <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg border-2 border-transparent hover:from-purple-700 hover:to-indigo-700 hover:border-white/20 transition-all duration-300 transform hover:scale-105 shadow-lg">
                   Get Started Today
                 </button>

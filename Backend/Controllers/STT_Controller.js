@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const Interview = require("../Models/Interview_Model");
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 const userSessions = {};
 
 async function analyzeSpeech(req, res) {
@@ -458,10 +458,10 @@ function getTimingMetrics(sessions) {
     let sessionProcessingTime = 0;
     let questionCount = 0;
 
-    session.evaluations?.forEach(eval => {
-      sessionResponseTime += eval.responseTime || 0;
-      sessionProcessingTime += eval.processingTime || 0;
-      questionCount++;
+    session.evaluations?.forEach(evaluation => {
+    sessionResponseTime += evaluation.responseTime || 0;
+    sessionProcessingTime += evaluation.processingTime || 0;
+    questionCount++;
     });
 
     if (questionCount > 0) {
