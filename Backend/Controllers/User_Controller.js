@@ -27,7 +27,7 @@ const SUPPORTED_FILE_TYPES = [
 // Gemini API configuration
 const GEMINI_API_KEY = process.env.API_KEY; // Store your API key in environment variables
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // Utility function to format text
 function formatText(text) {
