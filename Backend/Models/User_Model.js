@@ -18,6 +18,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    role: {
+      type: String
+    },
+
     appliedJobs: [
       {
         jobId: { type: mongoose.Schema.Types.ObjectId, ref: "JobProfile" },

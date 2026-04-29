@@ -584,10 +584,10 @@ const Experiences = () => {
                   </div>
 
                   {/* Date */}
-                  <div className="flex items-center text-gray-500 text-xs">
+                  {/* <div className="flex items-center text-gray-500 text-xs">
                     <Calendar size={14} className="mr-1" />
                     {new Date(experience.createdAt).toLocaleDateString()}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

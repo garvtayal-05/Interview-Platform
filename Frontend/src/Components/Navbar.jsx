@@ -151,7 +151,7 @@ const Navbar = () => {
               Home
             </NavLink>
             
-            <NavLink
+            {userRole === "normal" && (<NavLink
               to="/jobs"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium ${
@@ -163,7 +163,7 @@ const Navbar = () => {
             >
               <Briefcase className="h-4 w-4 mr-1" />
               Jobs
-            </NavLink>
+            </NavLink>)}
 
             {/* Experiences Section - Available to all users */}
             <NavLink
@@ -257,7 +257,7 @@ const Navbar = () => {
               </NavLink>
             )}
 
-            <NavLink
+            {userRole === 'normal' && (<NavLink
               to="/profile"
               className={({ isActive }) =>
                 `px-3 py-2 rounded-md text-sm font-medium ${
@@ -269,7 +269,7 @@ const Navbar = () => {
             >
               <User className="h-4 w-4 mr-1" />
               Profile
-            </NavLink>
+            </NavLink>)}
 
             {/* Dropdown Menu */}
             <div className="relative" ref={dropdownRef}>

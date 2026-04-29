@@ -181,7 +181,7 @@ async function User_CreateProfile(req, res) {
 
 
 
-async function Google_Login(req, res) {
+async function Google_Login_User(req, res) {
   const { name, email, googleId } = req.body;
 
   if (!email || !googleId || !name) {
@@ -196,6 +196,7 @@ async function Google_Login(req, res) {
       user = await Users.create({
         name,
         email,
+        role: 'normal',
         password: googleId, // not secure, only for dummy field (you can use a separate field like isGoogleUser: true)
       });
     }
@@ -227,6 +228,7 @@ async function User_SignUp(req, res){
         await Users.create({
          name, 
          email, 
+         role: 'normal',
          password: hashedPassword,
         });
 
@@ -280,7 +282,7 @@ async function User_ForgotPassword(req, res) {
 
   const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
-  // ✅ Send Email
+  //  Send Email
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -458,6 +460,96 @@ async function User_AppliedJobs(req, res) {
     }
   };
 
+
+
+  async function Google_Login_Admin(req, res) {
+  const { name, email, googleId } = req.body;
+
+  if (!email || !googleId || !name) {
+    return res.status(400).json({ Error: "Missing Google credentials" });
+  }
+
+  try {
+    let user = await Users.findOne({ email });
+
+    if (!user) {
+      // New User ➜ Signup
+      user = await Users.create({
+        name,
+        email,
+        role: 'admin',
+        password: googleId, // not secure, only for dummy field (you can use a separate field like isGoogleUser: true)
+      });
+    }
+
+    const token = setUser(user); // your custom JWT generator
+    return res.status(200).json({ token });
+  } catch (err) {
+    console.log("Google Login Error:", err);
+    return res.status(500).json({ Error: "Internal Server Error" });
+  }
+}
+
+async function Admin_SignUp(req, res){
+    const {name, email, password} = req.body;
+
+        const temp_user = await Users.findOne({email: email.trim().toLowerCase()})
+        
+        if(temp_user){
+            return res.status(409).json({Error: "Email id already exist. Please change it"});
+        }
+
+    if(!name || !email || !password){
+        return res.status(400).json({Error: "All fields are necessary"})
+    }
+    
+    const hashedPassword = await argon2.hash(password);
+    try{
+        await Users.create({
+         name, 
+         email, 
+         password: hashedPassword,
+         role: 'admin'
+        });
+
+        return res.status(200).json({Message: "User Created"});
+    }
+    catch(e){
+        console.log('Error: ', e);
+        return res.status(500).json({Error: "User Error"});
+    }
+}
+
+async function Admin_Login(req,res){
+    const {email, password} = req.body;
+
+    if(!email || !password){
+        return res.status(409).json({Error: "Email and password are required"});
+    }
+    try{
+
+        const user = await Users.findOne({email: email.trim().toLowerCase()})
+
+        if(!user){
+            return res.status(401).json({Error: 'Invalid Email'});
+        }
+
+        const isPasswordValid = await argon2.verify(user.password, password);
+
+        if(!isPasswordValid){
+            return res.status(401).json({Error: 'Wrong Password'})
+        }
+
+        const token = setUser(user);
+        return res.json({token});
+    }
+    catch(err){
+        console.log("Error: " ,err);
+        return res.status(500).json({Error : "Internal Server Error"});
+
+    }
+}
+
 module.exports={
     User_SignUp,
     User_Login,
@@ -470,6 +562,10 @@ module.exports={
     extractTextFromFile,
     cleanText,
     getJobApplications,
-    Google_Login,
-    verify_token
+    Google_Login_User,
+    verify_token,
+
+    Google_Login_Admin,
+    Admin_Login,
+    Admin_SignUp
 }

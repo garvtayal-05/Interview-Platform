@@ -18,7 +18,7 @@ const ResetPasswordPage = () => {
 useEffect(() => {
   const verifyToken = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-token`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/verify-token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

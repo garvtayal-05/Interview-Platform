@@ -2,9 +2,10 @@ const JobProfile = require("../Models/JobProfile_Model");
 require('dotenv').config()
 
 GEMINI_API_KEY = process.env.API_KEY
+GEMINI_MODEL = process.env.MODEL
 const { GoogleGenerativeAI } =  require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
 
 async function generateQuestions(req, res) {

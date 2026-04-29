@@ -47,6 +47,8 @@ const AnalyticsDashboard = () => {
         
         const data = await response.json();
         setAnalytics(data.analytics);
+        console.log(data.analytics);
+        console.log(analytics)
       } catch (error) {
         toast.error(`Failed to load analytics: ${error.message}`);
         console.error('Fetch error:', error);
@@ -174,15 +176,15 @@ const AnalyticsDashboard = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-white">Interview Performance Analytics</h1>
                   <div className="flex items-center mt-2">
-                    <div className="bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full text-purple-100 text-sm mr-3">
+                    {/* <div className="bg-purple-900 bg-opacity-50 px-3 py-1 rounded-full text-purple-100 text-sm mr-3">
                       {analytics.interviewCount || 0} Interviews • {analytics.sessionCount || 0} Mocks
-                    </div>
-                    <p className="text-purple-100">
+                    </div> */}
+                    {/* <p className="text-purple-100">
                       {formatDateSafe(analytics.firstActivityDate)} - {formatDateSafe(analytics.lastActivityDate)}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
-                <select 
+                {/* <select 
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value)}
                   className="bg-gray-800 border border-gray-700 text-white rounded-md px-3 py-1 text-sm"
@@ -191,7 +193,7 @@ const AnalyticsDashboard = () => {
                   <option value="month">Last Month</option>
                   <option value="quarter">Last 3 Months</option>
                   <option value="all">All Time</option>
-                </select>
+                </select> */}
               </div>
             </div>
           </div>

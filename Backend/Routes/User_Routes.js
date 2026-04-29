@@ -1,13 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword, User_CreateProfile, User_ApplyJob, User_AppliedJobs, getJobApplications, Google_Login, verify_token } = require('../Controllers/User_Controller');
+
+const { User_SignUp, User_Login, User_PasswordReset, User_ForgotPassword, User_CreateProfile, User_ApplyJob, User_AppliedJobs, getJobApplications, Google_Login_User, verify_token, Admin_Login, Admin_SignUp, Google_Login_Admin } = require('../Controllers/User_Controller');
+
 const { checkforAuth, restrictTo} = require('../MiddleWares/MiddleAuth');
 require('../Controllers/User_Controller');
 const upload = require('../Controllers/User_Controller').upload;
 
 router.post('/signup',User_SignUp);
 router.post('/login',User_Login);
-router.post('/google-login', Google_Login);
+router.post('/google-login', Google_Login_User);
+
+router.post('/signup-admin',Admin_SignUp);
+router.post('/login-admin',Admin_Login);
+router.post('/google-login-admin', Google_Login_Admin);
+
 router.post('/reset-password', User_PasswordReset)
 router.post('/forgot-password', User_ForgotPassword)
 router.post('/verify-token', verify_token)

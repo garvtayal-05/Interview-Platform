@@ -31,10 +31,10 @@ const JobCard = ({ job }) => {
         </div>
 
         {/* Company name */}
-        <div className="flex items-center text-gray-300">
+        {/* <div className="flex items-center text-gray-300">
           <Building className="text-purple-400 mr-2" size={16} />
           <span className="font-medium">{job.company || "Company Name"}</span>
-        </div>
+        </div> */}
 
         {/* Requirements */}
         <div className="mt-4">

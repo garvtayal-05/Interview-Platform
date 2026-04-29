@@ -274,9 +274,9 @@ const CommunityForm = () => {
                     <p className="text-gray-300 mb-4 line-clamp-2">{discussion.content}</p>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-400">
+                      {/* <span className="text-sm text-gray-400">
                         {comments[discussion._id]?.length || 0} comments
-                      </span>
+                      </span> */}
                       <button className="text-indigo-400 text-sm">
                         {expandedDiscussion === discussion._id ? "Hide Details" : "View Details"}
                       </button>
@@ -330,9 +330,9 @@ const CommunityForm = () => {
                               className="p-4 bg-gray-700 rounded-lg border border-gray-600"
                             >
                               <p className="text-gray-300 mb-3">{comment.content}</p>
-                              <p className="text-sm text-gray-400 mb-2">
+                              {/* <p className="text-sm text-gray-400 mb-2">
                                 Commented by: {comment.createdBy?.name || "Unknown"}
-                              </p>
+                              </p> */}
                               <div className="flex space-x-2 justify-end text-xs">
                                 <button
                                   onClick={() =>
